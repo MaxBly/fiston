@@ -1,0 +1,45 @@
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    background-color: black;
+}
+
+div {
+    left: 0px;
+    right: 0px;
+    margin-bottom: 50px;
+    text-align: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: white;
+}
+
+p {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+table {
+    margin: 10px 0px 0px 35%;
+    color: white;
+}
+
+button {
+    margin-top: 10px;
+    width: 300px;
+    margin-bottom: 50px;
+    padding: 2px;
+}
+
+label {
+    color: white;
+}
+
+input {
+    width: 200px;
+    margin: 5px;
+    border: none;
+    padding: 5px;
+}
