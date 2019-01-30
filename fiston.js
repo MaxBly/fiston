@@ -59,4 +59,4 @@ channel rt?
 
 //login
 discordbot.bot.login(process.env.TOKEN);
-server.listen(process.env.PORT);
+server.listen(7000);
