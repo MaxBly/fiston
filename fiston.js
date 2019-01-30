@@ -1,6 +1,15 @@
 //require
 var http = require('http');
 var express = require('express');
+
+
+//const
+require('dotenv').config();
+var time = { h: 7, m: 30 };
+
+//server
+var app = express();
+var server = http.createServer(app);
 var sio = require("socket.io")(server, {
     handlePreflightRequest: (req, res) => {
         const headers = {
@@ -12,16 +21,6 @@ var sio = require("socket.io")(server, {
         res.end();
     }
 });
-
-
-//const
-require('dotenv').config();
-var time = { h: 7, m: 30 };
-
-//server
-var app = express();
-var server = http.createServer(app);
-var io = socketio.listen(server);
 
 //libs
 var FistonTwit = require('./lib/fiston-twit');
