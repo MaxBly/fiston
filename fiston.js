@@ -1,7 +1,18 @@
 //require
 var http = require('http');
 var express = require('express');
-var socketio = require('socket.io');
+var sio = require("socket.io")(server, {
+    handlePreflightRequest: (req, res) => {
+        const headers = {
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
+            "Access-Control-Allow-Credentials": true
+        };
+        res.writeHead(200, headers);
+        res.end();
+    }
+});
+
 
 //const
 require('dotenv').config();
@@ -26,7 +37,7 @@ app.use('/fiston', twitbot.router);
 
 twitbot.schedule(time);
 
-io.sockets.on('connection', socket => {
+sio.on('connection', socket => {
 
     socket.on('getWords', _ => {
         twitbot.getWords((err, words) => {
