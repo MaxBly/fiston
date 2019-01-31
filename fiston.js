@@ -29,7 +29,7 @@ var FistonDjs = require('./lib/fiston-djs');
 
 //init
 var twitbot = new FistonTwit(require('./json/tokens.json'));
-var discordbot = new FistonDjs(process.env.TOKENS);
+var discordbot = new FistonDjs();
 
 //init server
 app.use('/fiston', twitbot.router);
