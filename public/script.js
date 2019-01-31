@@ -1,4 +1,4 @@
-var socket = io.connect('http://194.99.23.234:7000/');
+var socket = io.connect('http://localhost:7000/');
 
 var table = document.createElement('table');
 var p = document.querySelector('p');
