@@ -1,4 +1,4 @@
-var socket = io.connect('http://fiston.bly-net.com/');
+var socket = io.connect('http://bly-net.com:7000/');
 
 var table = document.createElement('table');
 var p = document.querySelector('p');
