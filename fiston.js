@@ -14,6 +14,7 @@ var sio = require("socket.io")(server, {
     handlePreflightRequest: (req, res) => {
         const headers = {
             "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Methods": "POST, GET, PUT",
             "Access-Control-Allow-Origin": "http://bly-net.com:7000/", //or the specific origin you want to give access to,
             "Access-Control-Allow-Credentials": true
         };
