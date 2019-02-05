@@ -31,7 +31,7 @@ socket.on('saveOk', _ => {
 })
 
 var init = (words, table) => {
-    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + words.length;
+    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + words.length - 1;
     loadTable(words, table);
 }
 
