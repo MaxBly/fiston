@@ -1,6 +1,7 @@
 //require
 var http = require('http');
 var express = require('express');
+var cors = require('cors');
 
 
 //const
@@ -10,18 +11,7 @@ var time = { h: 7, m: 30 };
 //server
 var app = express();
 var server = http.createServer(app);
-var sio = require("socket.io")(server, {
-    handlePreflightRequest: (req, res) => {
-        const headers = {
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            "Access-Control-Allow-Methods": "POST, GET, PUT",
-            "Access-Control-Allow-Origin": "http://bly-net.com:7000/", //or the specific origin you want to give access to,
-            "Access-Control-Allow-Credentials": true
-        };
-        res.writeHead(200, headers);
-        res.end();
-    }
-});
+var sio = require("socket.io").listen(server);
 
 //libs
 var FistonTwit = require('./lib/fiston-twit');
@@ -29,13 +19,15 @@ var FistonDjs = require('./lib/fiston-djs');
 
 //init
 var twitbot = new FistonTwit(require('./json/tokens.json'));
-var discordbot = new FistonDjs();
+var discordbot = new FistonDjs(process.env.TOKEN);
 
 //init server
+app.use(cors());
 app.use('/fiston', twitbot.router);
 
 
 twitbot.schedule(time);
+discordbot.schedule(time);
 
 sio.on('connection', socket => {
 
@@ -55,13 +47,6 @@ sio.on('connection', socket => {
 });
 
 
-/* todo discordbot
-blybot.old
-channelOMatic
-settings file?
-!motdujour schedule?
-channel rt?
-*/
 
 /* twitbot.Tweet((err) => {
     console.log(err)
@@ -69,5 +54,4 @@ channel rt?
 
 
 //login
-discordbot.bot.login(process.env.TOKEN);
 server.listen(7000);

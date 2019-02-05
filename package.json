@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/MaxBly/fiston#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "discord.js": "^11.4.2",
     "dotenv": "^6.2.0",
     "ejs": "^2.6.1",
