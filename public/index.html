@@ -11,16 +11,23 @@
 </head>
 
 <body>
-    <div class="form-group" id="container">
+    <div class="form-group row">
         <p></p>
         <button class="btn btn-primary" id="disp">Afficher les mots</button> <br />
-        <div class="form-group" id="textbox">
-            <label class="custom-control-label" for="w">Mot : </label>
-            <input class="" type="text" id="w"><br />
-            <label class="custom-control-label" for="c">Crédit : </label>
-            <input class="" type="text" id="c"><br />
-        </div>
-        <button class="btn btn-primary" id="send">Ajouter</button>
+        <fieldset style='border-radius: 10px; border: 1px solid;'>
+            <legend>Ajouter un mot nul</legend>
+            <div class="form-group" id="textbox">
+                <label class="custom-control-label" for="w">Mot : </label>
+                <input class="form-control" type="text" id="w"><br />
+                <label class="custom-control-label" for="c">Crédit : </label>
+                <input class="form-control" type="text" id="c"><br />
+            </div>
+            <button class="btn btn-primary" id="send">Ajouter</button>
+        </fieldset>
+    </div>
+
+
+    <div class="form-group" id="container">
     </div>
     <div id="words"></div>
 </body>

@@ -37,6 +37,7 @@ var init = (words, table) => {
 
 var loadTable = (words, table) => {
     table.innerHTML = "";
+    table.className = "table table-hover";
     d_words.append(table);
     var st_tr = document.createElement('tr');
     table.append(st_tr);
