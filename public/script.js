@@ -55,7 +55,7 @@ var loadTable = (words, table) => {
         var tr = document.createElement('tr');
         var i_th = document.createElement('th');
         if (words[0] == i) {
-            i_th.className = "table-active"
+            tr.className = "table-active"
             i_th.innerText = "➤ " + i;
         } else {
             i_th.innerText = "# " + i;
