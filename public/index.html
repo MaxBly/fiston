@@ -5,19 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://bootswatch.com/4/solar/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
     <title>Fiston</title>
 </head>
 
 <body>
-    <div id="container">
+    <div class="form-group" id="container">
         <p></p>
-        <button id="disp">Afficher les mots</button> <br />
-        <div id="textbox">
-            <label for="w">Mot : </label><input type="text" id="w"><br />
-            <label for="c">Crédit : </label><input type="text" id="c"><br />
+        <button class="btn btn-primary" id="disp">Afficher les mots</button> <br />
+        <div class="form-group" id="textbox">
+            <label class="custom-control-label" for="w">Mot : </label><input class="custom-control-input" type="text"
+                id="w"><br />
+            <label class="custom-control-label" for="c">Crédit : </label><input class="custom-control-input" type="text"
+                id="c"><br />
         </div>
-        <button id="send">Ajouter</button>
+        <button class="btn btn-primary" id="send">Ajouter</button>
     </div>
     <div id="words"></div>
 </body>
