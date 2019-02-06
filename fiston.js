@@ -42,7 +42,6 @@ sio.on('connection', socket => {
         twitbot.addWord(w, c, err => {
             if (err) throw err;
             socket.emit('saveOk');
-            console.log('added', { w, c });
         });
     });
 });

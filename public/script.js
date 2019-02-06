@@ -23,13 +23,11 @@ b_send.addEventListener('click', _ => {
 socket.emit('getWords');
 
 socket.on('loadWords', words => {
-    console.log(words)
     init(words, table);
 });
 
 socket.on('saveOk', _ => {
     socket.emit('getWords');
-    console.log('saveOk')
 })
 
 var init = (words, table) => {
@@ -42,6 +40,7 @@ var loadTable = (words, table) => {
     table.className = "table";
     d_words.append(table);
     var st_tr = document.createElement('tr');
+    st_tr.className = "table-primary"
     table.append(st_tr);
     var st_th = document.createElement('th');
     var nd_th = document.createElement('th');
@@ -57,10 +56,11 @@ var loadTable = (words, table) => {
         var tr = document.createElement('tr');
         var i_th = document.createElement('th');
         if (words[0] == i) {
-            tr.className = "table-active"
+            tr.className = "table-success"
             i_th.innerText = "➤ " + i;
         } else {
             i_th.innerText = "# " + i;
+            tr.className = "table-dark"
         }
         var w_th = document.createElement('th');
         var c_th = document.createElement('th');
@@ -71,5 +71,4 @@ var loadTable = (words, table) => {
         tr.append(w_th);
         tr.append(c_th);
     }
-    console.log(table)
 }
