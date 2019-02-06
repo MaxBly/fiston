@@ -5,12 +5,12 @@ var p = document.querySelector('p');
 
 
 var d_words = document.getElementById('words');
-d_words.style.visibility = "hidden";
+d_words.style.display = "none";
 
 var b_disp = document.getElementById('disp');
 b_disp.addEventListener('click', _ => {
-    d_words.style.visibility = (d_words.style.visibility == "hidden") ? "visible" : "hidden";
-    b_disp.innerHTML = (d_words.style.visibility == "hidden") ? "Afficher les mots" : "Masquer les mots";
+    d_words.style.display = (d_words.style.display == "none") ? "block" : "none";
+    b_disp.innerHTML = (d_words.style.display == "none") ? "Afficher les mots" : "Masquer les mots";
 });
 
 var b_send = document.getElementById('send');
@@ -37,7 +37,7 @@ var init = (words, table) => {
 
 var loadTable = (words, table) => {
     table.innerHTML = "";
-    table.className = "table";
+    table.className = "table table-hover";
     d_words.append(table);
     var st_tr = document.createElement('tr');
     st_tr.className = "table-primary"
