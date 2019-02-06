@@ -23,7 +23,8 @@ b_send.addEventListener('click', _ => {
 socket.emit('getWords');
 
 socket.on('loadWords', words => {
-    init(words, table)
+    console.log(words)
+    loadTable(words, table);
 });
 
 socket.on('saveOk', _ => {
@@ -31,7 +32,7 @@ socket.on('saveOk', _ => {
 })
 
 var init = (words, table) => {
-    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + words.length - 1;
+    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + parseInt(words.length - 1);
     loadTable(words, table);
 }
 
