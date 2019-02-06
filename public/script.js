@@ -24,7 +24,7 @@ socket.emit('getWords');
 
 socket.on('loadWords', words => {
     console.log(words)
-    loadTable(words, table);
+    init(words, table);
 });
 
 socket.on('saveOk', _ => {
