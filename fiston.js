@@ -23,7 +23,7 @@ var discordbot = new FistonDjs(process.env.TOKEN);
 
 //init server
 app.use(cors());
-app.use('/fiston', twitbot.router);
+app.use('/', twitbot.router);
 
 
 twitbot.schedule(time);
