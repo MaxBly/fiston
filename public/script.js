@@ -29,6 +29,7 @@ socket.on('loadWords', words => {
 
 socket.on('saveOk', _ => {
     socket.emit('getWords');
+    console.log('saveOk')
 })
 
 var init = (words, table) => {
