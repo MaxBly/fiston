@@ -25,7 +25,13 @@ const discordbot = new FistonDjs(process.env.TOKEN);
 app.use(cors());
 app.use('/', twitbot.router);
 
-discordbot.scheduledWord();
+let channel = discordbot.bot.guilds
+    .map(g => g.channels)
+    .map(c => c.get('502164417597800479'));
+
+discordbot.sendLastWord(channel);
+
+
 twitbot.schedule(time);
 discordbot.schedule(time);
 
