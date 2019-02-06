@@ -27,7 +27,7 @@ app.use('/', twitbot.router);
 
 let channel = discordbot.bot
     .guilds.get('264774483250905088')
-    .channel.get('502164417597800479');
+    .channels.get('502164417597800479');
 console.log(channel.name);
 
 discordbot.sendLastWord(channel);
