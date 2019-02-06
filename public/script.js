@@ -1,22 +1,22 @@
-var socket = io.connect('http://bly-net.com:7000/');
+const socket = io.connect('http://bly-net.com:7000/');
 
-var table = document.createElement('table');
-var p = document.querySelector('p');
+const table = document.createElement('table');
+const p = document.querySelector('p');
 
 
-var d_words = document.getElementById('words');
+const d_words = document.getElementById('words');
 d_words.style.display = "none";
 
-var b_disp = document.getElementById('disp');
+const b_disp = document.getElementById('disp');
 b_disp.addEventListener('click', _ => {
     d_words.style.display = (d_words.style.display == "none") ? "inline" : "none";
     b_disp.innerHTML = (d_words.style.display == "none") ? "Afficher les mots" : "Masquer les mots";
 });
 
-var b_send = document.getElementById('send');
+const b_send = document.getElementById('send');
 b_send.addEventListener('click', _ => {
-    var w = document.getElementById('w').value;
-    var c = document.getElementById('c').value;
+    let w = document.getElementById('w').value;
+    let c = document.getElementById('c').value;
     socket.emit('save', { w, c });
 });
 
@@ -30,21 +30,21 @@ socket.on('saveOk', _ => {
     socket.emit('getWords');
 })
 
-var init = (words, table) => {
+const init = (words, table) => {
     p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + parseInt(words.length - 1);
     loadTable(words, table);
 }
 
-var loadTable = (words, table) => {
+const loadTable = (words, table) => {
     table.innerHTML = "";
     table.className = "table table-hover";
     d_words.append(table);
-    var st_tr = document.createElement('tr');
+    let st_tr = document.createElement('tr');
     st_tr.className = "table-primary"
     table.append(st_tr);
-    var st_th = document.createElement('th');
-    var nd_th = document.createElement('th');
-    var rd_th = document.createElement('th');
+    let st_th = document.createElement('th');
+    let nd_th = document.createElement('th');
+    let rd_th = document.createElement('th');
     st_th.innerHTML = "<u><b>N°</b></u>";
     nd_th.innerHTML = "<u><b>Mot</b></u>";
     rd_th.innerHTML = "<u><b>Credit</b></u>";
@@ -52,9 +52,9 @@ var loadTable = (words, table) => {
     st_tr.append(nd_th);
     st_tr.append(rd_th);
 
-    for (var i = 1; i <= words.length - 1; i++) {
-        var tr = document.createElement('tr');
-        var i_th = document.createElement('th');
+    for (let i = 1; i <= words.length - 1; i++) {
+        let tr = document.createElement('tr');
+        let i_th = document.createElement('th');
         if (words[0] == i) {
             tr.className = "table-success"
             i_th.innerText = "➤ " + i;
@@ -62,8 +62,8 @@ var loadTable = (words, table) => {
             i_th.innerText = "# " + i;
             tr.className = "table-dark"
         }
-        var w_th = document.createElement('th');
-        var c_th = document.createElement('th');
+        let w_th = document.createElement('th');
+        let c_th = document.createElement('th');
         w_th.innerText = words[i][0];
         c_th.innerText = words[i][1];
         table.append(tr);

@@ -1,25 +1,25 @@
 //require
-var http = require('http');
-var express = require('express');
-var cors = require('cors');
+const http = require('http');
+const express = require('express');
+const cors = require('cors');
 
 
 //const
 require('dotenv').config();
-var time = { h: 7, m: 30 };
+const time = { h: 7, m: 30 };
 
 //server
-var app = express();
-var server = http.createServer(app);
-var sio = require("socket.io").listen(server);
+const app = express();
+const server = http.createServer(app);
+const sio = require("socket.io").listen(server);
 
 //libs
-var FistonTwit = require('./lib/fiston-twit');
-var FistonDjs = require('./lib/fiston-djs');
+const FistonTwit = require('./lib/fiston-twit');
+const FistonDjs = require('./lib/fiston-djs');
 
 //init
-var twitbot = new FistonTwit(require('./json/tokens.json'));
-var discordbot = new FistonDjs(process.env.TOKEN);
+const twitbot = new FistonTwit(require('./json/tokens.json'));
+const discordbot = new FistonDjs(process.env.TOKEN);
 
 //init server
 app.use(cors());
