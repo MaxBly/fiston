@@ -25,7 +25,7 @@ const discordbot = new FistonDjs(process.env.TOKEN);
 app.use(cors());
 app.use('/', twitbot.router);
 
-
+discordbot.scheduledWord();
 twitbot.schedule(time);
 discordbot.schedule(time);
 
