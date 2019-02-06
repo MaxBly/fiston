@@ -25,9 +25,9 @@ const discordbot = new FistonDjs(process.env.TOKEN);
 app.use(cors());
 app.use('/', twitbot.router);
 
-let channel = discordbot.bot.guilds
-    .map(g => g.channels)
-    .map(c => c.get('502164417597800479'));
+let channel = discordbot.bot
+    .guilds.get('264774483250905088')
+    .channel.get('502164417597800479');
 console.log(channel.name);
 
 discordbot.sendLastWord(channel);
