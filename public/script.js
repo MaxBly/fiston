@@ -9,7 +9,7 @@ d_words.style.display = "none";
 
 var b_disp = document.getElementById('disp');
 b_disp.addEventListener('click', _ => {
-    d_words.style.display = (d_words.style.display == "none") ? "block" : "none";
+    d_words.style.display = (d_words.style.display == "none") ? "inline" : "none";
     b_disp.innerHTML = (d_words.style.display == "none") ? "Afficher les mots" : "Masquer les mots";
 });
 
