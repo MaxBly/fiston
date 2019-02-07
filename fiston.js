@@ -19,22 +19,13 @@ const FistonDjs = require('./lib/fiston-djs');
 
 //init
 const twitbot = new FistonTwit(require('./json/tokens.json'));
-const discordbot = new FistonDjs(process.env.TOKEN);
+const discordbot = new FistonDjs(process.env.TOKEN, time);
 
 //init server
 app.use(cors());
 app.use('/', twitbot.router);
 
-let channel = discordbot.bot
-    .guilds.get('264774483250905088')
-    .channels.get('502164417597800479');
-console.log(channel.name);
-
-discordbot.sendLastWord(channel);
-
-
 twitbot.schedule(time);
-discordbot.schedule(time);
 
 sio.on('connection', socket => {
 

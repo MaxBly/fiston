@@ -52,7 +52,7 @@ const loadTable = (words, table) => {
     st_tr.append(nd_th);
     st_tr.append(rd_th);
 
-    for (let i = 1; i <= words.length - 1; i++) {
+    for (let i = words.length - 1; i >= 1; i--) {
         let tr = document.createElement('tr');
         let i_th = document.createElement('th');
         if (words[0] == i) {
