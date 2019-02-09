@@ -2,6 +2,7 @@
 const http = require('http');
 const express = require('express');
 const cors = require('cors');
+const wd = require('word-definition');
 
 
 //const
@@ -41,10 +42,22 @@ sio.on('connection', socket => {
             if (err) throw err;
             socket.emit('saveOk');
         });
+    }); ''
+});
+
+/* twitbot.getWords((err, words) => {
+    let data = [];
+    for (const { w } of words) {
+        wd.getDef(w, 'fr', null, def => {
+            data.push(def);
+        });
+    }
+    require('fs').writeFile(__dirname + '/json/defs.json', JSON.stringify(data, null, '\t'), _ => {
+        console.log(data);
     });
 });
 
-
+ */
 
 /* twitbot.Tweet((err) => {
     console.log(err)
