@@ -1,4 +1,4 @@
-const socket = io.connect('http://bly-net.com:7000/');
+const socket = io.connect('http://localhost:7000');
 
 const table = document.createElement('table');
 const p = document.querySelector('p');
@@ -15,23 +15,26 @@ b_disp.addEventListener('click', _ => {
 
 const b_send = document.getElementById('send');
 b_send.addEventListener('click', _ => {
-    let w = document.getElementById('w').value;
-    let c = document.getElementById('c').value;
-    socket.emit('save', { w, c });
+    let w = document.getElementById('w');
+    let word = w.value;
+    let c = document.getElementById('c');
+    let credit = c.value;
+    socket.emit('save', { word, credit });
+    w.value = "";
 });
 
-socket.emit('getWords');
+socket.emit('getReducedWords');
 
-socket.on('loadWords', words => {
+socket.on('loadReducedWords', words => {
     init(words, table);
 });
 
 socket.on('saveOk', _ => {
-    socket.emit('getWords');
+    socket.emit('getReducedWords');
 })
 
 const init = (words, table) => {
-    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + parseInt(words.length - 1);
+    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + words.length;
     loadTable(words, table);
 }
 
@@ -52,20 +55,20 @@ const loadTable = (words, table) => {
     st_tr.append(nd_th);
     st_tr.append(rd_th);
 
-    for (let i = words.length - 1; i >= 1; i--) {
+    for (let i = words.length - 1; i >= 0; i--) {
         let tr = document.createElement('tr');
         let i_th = document.createElement('th');
-        if (words[0] == i) {
+        if (words[i].isNext) {
             tr.className = "table-success"
-            i_th.innerText = "➤ " + i;
+            i_th.innerText = "➤ " + (i + 1);
         } else {
-            i_th.innerText = "# " + i;
+            i_th.innerText = "# " + (i + 1);
             tr.className = "table-dark"
         }
         let w_th = document.createElement('th');
         let c_th = document.createElement('th');
-        w_th.innerText = words[i][0];
-        c_th.innerText = words[i][1];
+        w_th.innerText = words[i].word;
+        c_th.innerText = words[i].credit;
         table.append(tr);
         tr.append(i_th);
         tr.append(w_th);
