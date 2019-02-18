@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 //const wd = require('word-definition');
-const words = require('./json/words.json');
+//const words = require('./json/words.json');
 
 //const
 require('dotenv').config();

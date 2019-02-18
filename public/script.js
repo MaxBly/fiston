@@ -1,4 +1,4 @@
-const socket = io.connect('http://localhost:7000');
+const socket = io.connect('http://fiston.bly-net.com/');
 
 const table = document.createElement('table');
 const p = document.querySelector('p');
@@ -34,7 +34,7 @@ socket.on('saveOk', _ => {
 })
 
 const init = (words, table) => {
-    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot null à la base de donnée ici, il y en a déjà " + words.length;
+    p.innerHTML = "Bot 100% useless créé par MaxBly, vous pouvez ajouter un mot nul à la base de donnée ici, il y en a déjà " + words.length;
     loadTable(words, table);
 }
 
