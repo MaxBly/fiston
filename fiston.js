@@ -41,8 +41,8 @@ const twitbot = new FistonTwit({
 
 app.use(cors());
 app.use('/', twitbot.router);
-//twitbot.schedule(time);
-twitbot.Tweet();
+twitbot.schedule(time);
+//twitbot.Tweet();
 
 sio.on('connection', socket => {
 
