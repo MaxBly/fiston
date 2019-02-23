@@ -1,5 +1,5 @@
-let mongoose = require('mongoose');
-let S = require('string');
+const mongoose = require('mongoose');
+const S = require('string');
 
 const wordSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
@@ -10,7 +10,7 @@ const wordSchema = new mongoose.Schema({
 });
 
 
-let words = mongoose.model('Words', wordSchema);
+const words = mongoose.model('Words', wordSchema);
 
 class Words {
 
@@ -33,9 +33,9 @@ class Words {
         mongoose.connect(this.url, this.options);
         let db = mongoose.connection;
         db.once('open', _ => {
-            words.find(ops).exec().then(W => {
+            words.find(ops).exec().then(data => {
                 db.close()
-                cb(null, W)
+                cb(null, data)
             }).catch(err => {
                 db.close()
                 cb(err);
@@ -51,9 +51,9 @@ class Words {
         mongoose.connect(this.url, this.options);
         let db = mongoose.connection;
         db.once('open', _ => {
-            words.findOne(ops).exec().then(W => {
+            words.findOne(ops).exec().then(data => {
                 db.close()
-                cb(null, W)
+                cb(null, data)
             }).catch(err => {
                 db.close()
                 cb(err);
@@ -117,7 +117,7 @@ class Words {
                 let n = Words.length + 1;
                 console.log(n)
                 let neW = new words({
-                    _id: mongoose.Types.ObjectId(),
+                    _id: new mongoose.Types.ObjectId(),
                     index: n,
                     word: W.word,
                     credit: W.credit,
@@ -194,9 +194,9 @@ class Words {
             let i = next.index;
             console.log(i)
             this.updateWord({ isNext: true }, { isNext: false }, (err, _) => {
-                if (err) cb(err);
+                if (err) cb(err, _);
                 this.updateWord({ index: i }, { isNext: true }, (err, _) => {
-                    cb(err)
+                    cb(err, _)
                 });
             });
         });
@@ -229,4 +229,4 @@ class Words {
 }
 
 
-module.exports = Words;
+module.exports = { Words, words };

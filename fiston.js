@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const sio = require("socket.io").listen(server);
 
 //libs
-const Words = require('./models/Words');
+const { Words } = require('./models/Words');
 const FistonTwit = require('./lib/fiston-twit');
 //const FistonDjs = require('./lib/fiston-djs');
 //const discordbot = new FistonDjs(process.env.DJS_TOKEN, time);
@@ -41,7 +41,8 @@ const twitbot = new FistonTwit({
 
 app.use(cors());
 app.use('/', twitbot.router);
-twitbot.schedule(time);
+//twitbot.schedule(time);
+twitbot.Tweet();
 
 sio.on('connection', socket => {
 
