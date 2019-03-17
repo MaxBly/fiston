@@ -19,13 +19,11 @@ export interface IWordsOptions {
     credit?: string,
     isNext?: boolean,
 }
-
 export interface IWordsReduced {
     word: string,
     credit: string,
     isNext: boolean,
 }
-
 export const words = mongoose.model('Words', wordSchema);
 
 export class Words {
