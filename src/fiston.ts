@@ -21,7 +21,7 @@ import { Words } from "./models/Words"
 import { Guilds } from "./models/Guilds"
 import { TwitBot as FistonTwit, time } from "./lib/fiston-twit"
 import FistonDjs from "./lib/fiston-djs"
-//Words.import(words);
+//Words.setNext(103);
 //init
 const time: time = { h: 17, m: 42 };
 //const discordbot = new FistonDjs(process.env.DJS_TOKEN);
@@ -42,7 +42,7 @@ const twitbot = new FistonTwit({
 app.use(cors());
 app.use('/', twitbot.router);
 (async () => {
-    await twitbot.Tweet()
+    //await twitbot.Tweet()
 })()
 
 process.on("unhandledRejection", error => {

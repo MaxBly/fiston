@@ -5,7 +5,6 @@ import { Words } from '../models/Words'
 
 export interface time { h: number, m: number }
 
-
 export class TwitBot {
     twit: Twit;
     router: express.Router;
@@ -49,30 +48,47 @@ export class TwitBot {
             minutes: n.getMinutes(),
             seconds: n.getSeconds(),
         });
-
+        // this.duCul('fiston')
         let ruleDuCul = new schedule.RecurrenceRule();
         ruleDuCul.minute = 0;
-        let jobDuCul = schedule.scheduleJob(ruleDuCul, this.duCul)
-
+        let jobDuCul = schedule.scheduleJob(ruleDuCul, () => { this.duCul('fiston', 'BotDuCul') })
     }
 
-    async duCul() {
+    async duCul(word: string, author: string) {
         try {
-            let res = await this.search('@BotDuCul, fiston');
-            if ((res.screen_name == 'BotDuCul') && res.text.includes('fiston')) {
-                return console.log(res);
+            let res: any = await this.search(`${word} from:${author}`);
+            if ((res.screen_name === author) && (res.text.split(' ').includes(word))) {
+                console.log('fiston found!')
+                return this.reply('🤔', res.id, res.screen_name);
+            } else {
+                console.log('fiston not found, not this time, maybe later...')
             }
         } catch (e) { return e }
     }
 
-    async tweet(status: any) {
-        try {
+    async tweet(status: string) {
+        return new Promise((resolve, reject) => {
             this.twit.post('statuses/update', { status }, (err: any, data: any, response: any) => {
-                console.log(`[${data.created_at}][${data.text}]`);
-                if (err) throw err;
-                else return data
+                try {
+                    console.log(`[${data.created_at}][${data.text}]`);
+                    if (err) throw err;
+                    else resolve(data)
+                } catch (e) { reject(e) }
             });
-        } catch (e) { return e }
+        })
+    }
+
+    async reply(text: string, id: number | string, screen_name: string) {
+        let status = `@${screen_name} ${text}`
+        return new Promise((resolve, reject) => {
+            this.twit.post('statuses/update', { status, in_reply_to_status_id: id }, (err: any, data: any, response: any) => {
+                try {
+                    console.log(`[${data.created_at}][${data.text}]`);
+                    if (err) throw err;
+                    else resolve(data)
+                } catch (e) { reject(e) }
+            });
+        })
     }
 
     async tweetWord(W: any) {
@@ -91,18 +107,21 @@ export class TwitBot {
         } catch (e) { return e }
     }
 
-    async search(q: string): Promise<any> {
-        try {
+    async search(q: string) {
+        return new Promise((resolve, reject) => {
             this.twit.get('search/tweets', { q, result_type: 'recent', count: 1 }, (err: any, data: any, respone: any) => {
-                if (err) throw err;
-                let tweet = data.statuses[0],
-                    { user, id_str, text } = tweet,
-                    { screen_name, name } = user,
-                    id = id_str;
-                console.log({ screen_name, name });
-                return { id, screen_name, name, text };
+                try {
+                    if (err) throw err;
+                    let tweet = data.statuses[0],
+                        { user, id_str, text } = tweet,
+                        { screen_name, name } = user,
+                        id = id_str,
+                        res = { id, screen_name, name, text }
+                    console.log('done');
+                    resolve(res);
+                } catch (e) { reject(e) }
             });
-        } catch (e) { return e }
+        })
     }
 
     async retweetWord(word: string) {

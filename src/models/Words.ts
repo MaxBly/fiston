@@ -120,9 +120,16 @@ export class Words {
     static async iterate() {
         try {
             let next: IWordsOptions = await this.getNextWord()
-            let i = next.index;
+            let index = next.index;
             await this.updateWord({ isNext: true }, { isNext: false })
-            return this.updateWord({ index: i }, { isNext: true })
+            return this.updateWord({ index }, { isNext: true })
+        } catch (e) { return e }
+    }
+
+    static async setNext(index: number) {
+        try {
+            await this.updateWord({ isNext: true }, { isNext: false })
+            return this.updateWord({ index }, { isNext: true })
         } catch (e) { return e }
     }
 
