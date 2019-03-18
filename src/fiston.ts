@@ -23,7 +23,7 @@ import { TwitBot as FistonTwit, time } from "./lib/fiston-twit"
 import FistonDjs from "./lib/fiston-djs"
 //Words.setNext(103);
 //init
-const time: time = { h: 17, m: 42 };
+const time: time = { h: 7, m: 30 };
 const discordbot = new FistonDjs(process.env.DJS_TOKEN);
 const twitbot = new FistonTwit({
     consumer: {

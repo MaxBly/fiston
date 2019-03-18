@@ -181,6 +181,7 @@ export default class Config {
     }
 
     async sendForm(form: configForm) {
+        console.log({ form })
         let { embed, emojis } = form;
         await this.post.clearReactions();
         await this.post.edit(`${this.member} !`, embed);
@@ -244,7 +245,7 @@ export default class Config {
     }
 
     get chanConf() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             try {
                 let state: any = await this.conf
                 let id: any = state.data.onWorkingChannel;
