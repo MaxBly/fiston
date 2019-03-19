@@ -53,7 +53,7 @@ export class Guilds {
         } catch (e) { return e }
     }
 
-    static async * getGuildChannels(ops: IGuildOptions): AsyncIterableIterator<IGuildOptions> {
+    static async * getGuildChannels(ops: IGuildOptions): AsyncIterableIterator<IChannelsOptions> {
         try {
             let guild: IGuildOptions = await this.getGuild(ops)
             for (let id of guild.channels) {

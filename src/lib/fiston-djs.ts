@@ -1,9 +1,25 @@
-import djs from 'discord.js'
+import djs, { ChannelData, Guild } from 'discord.js'
 import schedule from 'node-schedule'
 import fs from 'fs'
-import { Channels } from '../models/Channels'
-import { Guilds } from '../models/Guilds'
+import { Channels, IChannelsOptions } from '../models/Channels'
+import { Guilds, IGuildOptions } from '../models/Guilds'
 import Config from './fiston-djs-config'
+
+const emojis = { flag: "🏳", mic: "🎙", joystick: "🕹" }
+
+export interface IChannelData {
+    id: string,
+    guildId: string,
+    names: {
+        offline: string,
+        chatting: string,
+    },
+    emojis: {
+        offline: string,
+        chatting: string,
+        gaming: string,
+    }
+}
 
 export default class Fiston {
     public bot: djs.Client;
@@ -12,14 +28,12 @@ export default class Fiston {
         this.bot = new djs.Client();
         this.bot.on('ready', async () => {
             console.log('ready')
-            //console.log(this.bot.emojis)
-            /*
             let guilds = await Guilds.getGuilds({});
             guilds.forEach(async ({ id }) => {
-                for await (let channel of Guilds.getGuildChannels({id})) {
+                for await (let channel of Guilds.getGuildChannels({ id })) {
                     this.chanUpdate(channel)
                 }
-            }); */
+            });
         });
 
         this.bot.on('voiceStateUpdate', this.chanUpdaterHandler);
@@ -36,10 +50,12 @@ export default class Fiston {
         this.bot.login(token)
     }
 
-    chanUpdaterHandler(oldm: any, newm: any) {
-        /* Guilds.getGuildChannels({ id: newm.guild.id })
-            .then(this.chanUpdate)
-            .catch(console.error); */
+    async chanUpdaterHandler(oldm: any, newm: any) {
+        try {
+            for await (let channel of Guilds.getGuildChannels({ id: newm.guild.id })) {
+                this.chanUpdate(channel)
+            }
+        } catch (e) { console.error(e) }
     }
 
     schedule(time: { h: number, m: number }) {
@@ -69,15 +85,14 @@ export default class Fiston {
         }); */
     }
 
-    chanUpdate(channel: any) {
-        let { id, name, activity, guildId } = channel;
 
-        const emojis = { flag: "🏳", mic: "🎙", joystick: "🕹", }
+    static chanUpdate(channel: IChannelsOptions) {
+        console.log({ channel })
+        let { id, guildId, names, emojis } = channel;
         let chan: any = this.bot.guilds.get(guildId).channels.get(id)
         let members = chan.members.array();
         let gamesArr = members.reduce((arr: string[], member: any) => {
-            if (member.presence.game && member.presence.game.type == 0) arr.push(member.presence.game.name);
-            else arr.push(activity);
+            if (member.presence.game/*  && member.presence.game.type == 0 */) arr.push(member.presence.game.name);
         }, []);
 
         let gamesObj = gamesArr.reduce((obj: any, game: string) => {
@@ -95,9 +110,10 @@ export default class Fiston {
         }, { max: 0, game: "" });
 
         if (members.length) {
-            chan.setName(`${emojis.mic} ${activity}`);
+            if (members.length == result.max) chan.setName(`${emojis.gaming} ${result.game}`);
+            else chan.setName(`${emojis.chatting} ${names.chatting}`);
         } else {
-            chan.setName(`${emojis.flag} ${name}`);
+            chan.setName(`${emojis.offline} ${names.offline}`);
         }
         console.log({ result })
     }

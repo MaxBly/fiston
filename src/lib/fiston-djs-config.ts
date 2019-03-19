@@ -172,6 +172,7 @@ export default class Config {
 
     async createForm(type: configFormType, ops?: any): Promise<void> {
         try {
+            console.log({ type })
             let form = await this.buildForm(type, ops);
             let reacts = await this.sendForm(form);
             return this.reactHandler(reacts);

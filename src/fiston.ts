@@ -24,7 +24,7 @@ import FistonDjs from "./lib/fiston-djs"
 //Words.setNext(103);
 //init
 const time: time = { h: 7, m: 30 };
-const discordbot = new FistonDjs(process.env.DJS_TOKEN);
+//const discordbot = new FistonDjs(process.env.DJS_TOKEN);
 const twitbot = new FistonTwit({
     consumer: {
         key: process.env.TWIT_CONSUMER_KEY,

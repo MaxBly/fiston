@@ -21,13 +21,13 @@ export interface IChannelsOptions {
     id?: string,
     guildId?: string,
     names?: {
-        offline?: String,
-        chatting?: String,
+        offline?: string,
+        chatting?: string,
     },
     emojis?: {
-        offline?: String,
-        chatting?: String,
-        gaming?: String,
+        offline?: string,
+        chatting?: string,
+        gaming?: string,
     }
 }
 

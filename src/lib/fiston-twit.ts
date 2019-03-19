@@ -39,7 +39,7 @@ export class TwitBot {
         this.rule.minute = time.m
         this.job = schedule.scheduleJob(this.rule, this.Tweet)
         let n = this.job.nextInvocation();
-        console.log('schedule', {
+        console.log('next tweet', {
             year: n.getFullYear(),
             month: n.getMonth(),
             date: n.getDate(),
@@ -55,15 +55,16 @@ export class TwitBot {
     }
 
     async duCul(word: string, author: string) {
+        console.log('duCul...')
         try {
             let res: any = await this.search(`${word} from:${author}`);
             if ((res.screen_name === author) && (res.text.split(' ').includes(word))) {
                 console.log('fiston found!')
-                return this.reply('🤔', res.id, res.screen_name);
+                return this.reply(`🤔`, res.id, res.screen_name);
             } else {
                 console.log('fiston not found, not this time, maybe later...')
             }
-        } catch (e) { return e }
+        } catch (e) { console.log(e) }
     }
 
     async tweet(status: string) {
