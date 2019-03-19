@@ -10,6 +10,7 @@ export class TwitBot {
     router: express.Router;
     job: schedule.Job;
     rule: schedule.RecurrenceRule;
+    jobDuCul: schedule.Job;
     constructor(tokens: any, time: time) {
         this.twit = new Twit({
             consumer_key: tokens.consumer.key,
@@ -48,10 +49,9 @@ export class TwitBot {
             minutes: n.getMinutes(),
             seconds: n.getSeconds(),
         });
-        // this.duCul('fiston')
         let ruleDuCul = new schedule.RecurrenceRule();
         ruleDuCul.minute = 0;
-        let jobDuCul = schedule.scheduleJob(ruleDuCul, () => { this.duCul('fiston', 'BotDuCul') })
+        this.jobDuCul = schedule.scheduleJob(ruleDuCul, () => { this.duCul('fiston', 'BotDuCul') })
     }
 
     async duCul(word: string, author: string) {
