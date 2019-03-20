@@ -52,26 +52,21 @@ export default class Config {
         this.configChannelName = "fiston-config"
         this.guild = msg.guild;
 
-        if ((!!this.member) && this.member.hasPermission('ADMINISTRATOR')) {
-            try {
-                this.fetchConfigChannel().then(channel => {
-                    this.channel = channel
-                    console.log('FCC ok...', channel.name);
-                    msg.reply('Voyons cela dans mon duplex ' + channel);
-
-                    this.fetchConfigMessage().then(post => {
-                        this.post = post
-
-                        console.log('FCM ok...', post.id)
-
-                        this.conf = Promise.resolve({ post: post.id, chan: channel.id, form: configFormType.main });
-                        this.createForm(configFormType.main)
-                    })
-                })
-            } catch (e) { console.error(e) }
-        } else {
-            msg.reply('nop t pas admin fdp');
-        }
+        (async () => {
+            if ((!!this.member) && this.member.hasPermission('ADMINISTRATOR')) {
+                try {
+                    this.channel = await this.fetchConfigChannel()
+                    console.log('FCC ok...', this.channel.name);
+                    msg.reply('Voyons cela dans mon duplex ' + this.channel);
+                    this.post = await this.fetchConfigMessage()
+                    console.log('FCM ok...', this.post.id)
+                    this.conf = Promise.resolve({ post: this.post.id, chan: this.channel.id, form: configFormType.main });
+                    this.createForm(configFormType.main)
+                } catch (e) { console.error(e) }
+            } else {
+                msg.reply('nop t pas admin fdp');
+            }
+        }).apply(this)
     }
 
     async buildForm(type: configFormType, ops?: any): Promise<configForm> {

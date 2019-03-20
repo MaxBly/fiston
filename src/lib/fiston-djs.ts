@@ -22,22 +22,20 @@ export interface IChannelData {
 }
 
 export default class Fiston {
-    public bot: djs.Client;
+    bot: djs.Client;
 
     constructor(token?: string) {
         this.bot = new djs.Client();
         this.bot.on('ready', async () => {
             console.log('ready')
             let guilds = await Guilds.getGuilds({});
-            guilds.forEach(async ({ id }) => {
-                for await (let channel of Guilds.getGuildChannels({ id })) {
-                    this.chanUpdate(channel)
-                }
+            guilds.forEach(({ id }) => {
+                Guilds.getGuildChannels({ id }, this.chanUpdate.bind(this))
             });
         });
 
-        this.bot.on('voiceStateUpdate', this.chanUpdaterHandler);
-        this.bot.on('presenceUpdate', this.chanUpdaterHandler);
+        this.bot.on('voiceStateUpdate', this.chanUpdaterHandler.bind(this));
+        this.bot.on('presenceUpdate', this.chanUpdaterHandler.bind(this));
         this.bot.on('message', (msg: any) => {
             let cmd = msg.content.substring(1).split(' ')[0];
             let arg = msg.content.split(' ').slice(1);
@@ -52,10 +50,8 @@ export default class Fiston {
 
     async chanUpdaterHandler(oldm: any, newm: any) {
         try {
-            for await (let channel of Guilds.getGuildChannels({ id: newm.guild.id })) {
-                this.chanUpdate(channel)
-            }
-        } catch (e) { console.error(e) }
+            Guilds.getGuildChannels({ id: newm.guild.id }, this.chanUpdate.bind(this))
+        } catch (e) { console.log(e) }
     }
 
     schedule(time: { h: number, m: number }) {
@@ -86,7 +82,7 @@ export default class Fiston {
     }
 
 
-    static chanUpdate(channel: IChannelsOptions) {
+    chanUpdate(channel: IChannelsOptions) {
         console.log({ channel })
         let { id, guildId, names, emojis } = channel;
         let chan: any = this.bot.guilds.get(guildId).channels.get(id)

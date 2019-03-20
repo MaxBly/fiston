@@ -112,12 +112,12 @@ export class TwitBot {
         return new Promise((resolve, reject) => {
             this.twit.get('search/tweets', { q, result_type: 'recent', count: 1 }, (err: any, data: any, respone: any) => {
                 try {
-                    if (err) throw err;
-                    let tweet = data.statuses[0],
-                        { user, id_str, text } = tweet,
-                        { screen_name, name } = user,
-                        id = id_str,
-                        res = { id, screen_name, name, text }
+                    if (err || !data.statuses[0].user) throw new Error('Tweet not found');
+                    let tweet = data.statuses[0]
+                    let { user, id_str, text } = tweet
+                    let { screen_name, name } = user
+                    let id = id_str
+                    let res = { id, screen_name, name, text }
                     console.log('done');
                     resolve(res);
                 } catch (e) { reject(e) }

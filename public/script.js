@@ -1,5 +1,5 @@
 //const socket = io.connect('http://fiston.bly-net.com/');
-let socket = io.connect('http://localhost:7000');
+const socket = io.connect('http://localhost:7000');
 
 const table = document.createElement('table');
 const p = document.querySelector('p');

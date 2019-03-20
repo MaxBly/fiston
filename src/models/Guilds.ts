@@ -53,13 +53,17 @@ export class Guilds {
         } catch (e) { return e }
     }
 
-    static async * getGuildChannels(ops: IGuildOptions): AsyncIterableIterator<IChannelsOptions> {
+    static async getGuildChannels(ops: IGuildOptions, cb: (channel: IChannelsOptions) => void) {
         try {
+
             let guild: IGuildOptions = await this.getGuild(ops)
-            for (let id of guild.channels) {
-                yield Channels.getChannel({ id })
-            }
-        } catch (e) { return e }
+            if (!guild) throw new Error('Guild not found')
+            console.log('getGuildChannels', { guild })
+            guild.channels.forEach(async (id: string) => {
+                let channel = await Channels.getChannel({ id });
+                cb(channel)
+            })
+        } catch (e) { console.error(e) }
     }
 
     static createGuild(id: string): IGuildOptions {
