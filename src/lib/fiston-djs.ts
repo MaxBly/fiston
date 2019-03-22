@@ -49,6 +49,7 @@ export default class Fiston {
     }
 
     async chanUpdaterHandler(oldm: any, newm: any) {
+        console.log('handled')
         try {
             Guilds.getGuildChannels({ id: newm.guild.id }, this.chanUpdate.bind(this))
         } catch (e) { console.log(e) }

@@ -1,8 +1,8 @@
 import djs from 'discord.js'
-import { Channels } from '../models/Channels'
-import { Guilds } from '../models/Guilds'
-import { config } from 'dotenv';
-import { isContext } from 'vm';
+import { Channels, IChannelsOptions } from '../models/Channels'
+import { Guilds, IGuildOptions } from '../models/Guilds'
+import { IncomingHttpHeaders } from 'http';
+import { Collection } from 'mongoose';
 
 const EmojisN = ['0⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 const Emojis = {
@@ -10,8 +10,8 @@ const Emojis = {
     end: "🔚",
     arrow_forward: "▶",
     arrow_backward: "◀",
-    on: "🔘",
-    off: "⚪",
+    on: "✅",
+    off: "❎",
     prefix: "❗",
     add: "➕",
     del: "➖",
@@ -23,7 +23,9 @@ const Emojis = {
     gear: "⚙"
 }
 
-export enum configFormType { main, channels, channel }
+export enum configFormType { main, channels, channel };
+export type EmojisType = 'chatting' | 'gaming' | 'offline';
+export type NamesType = 'chatting' | 'offline';
 
 export interface IconfigState {
     post: string,
@@ -44,6 +46,7 @@ export default class Config {
     guild: djs.Guild;
     channel: djs.TextChannel | any;
     post: djs.Message | undefined;
+    secondPost: djs.Message | undefined;
 
     constructor(msg: djs.Message) {
         let self = this;
@@ -72,6 +75,7 @@ export default class Config {
     async buildForm(type: configFormType, ops?: any): Promise<configForm> {
         let desc: string, allChannels: string[], state: IconfigState;
         let form: configForm;
+        const gsetttings: IGuildOptions = await Guilds.getGuild({ id: this.guild.id });
         switch (type) {
             case configFormType.main:
                 form = {
@@ -80,14 +84,13 @@ export default class Config {
                         .setDescription("__ __")
                         .setColor(16711680)
                         .addField("Channels :gear:", "Manage Channels")
-                        .addField("Prefix :exclamation:", "Change guild prefix, current : !"),
+                        .addField("Prefix :exclamation:", "Change guild prefix, current : " + gsetttings.prefix),
                     emojis: [Emojis.end, Emojis.gear, Emojis.prefix]
                 }
                 return form;
 
             case configFormType.channels:
-                const voiceChannels = this.guild.channels.filter((c: any) => c.type == 'voice')
-                const gsetttings: any = await Guilds.getGuild({ id: this.guild.id });
+                const voiceChannels = this.guild.channels.filter((c: djs.GuildChannel) => c.type == 'voice')
                 form = {
                     emojis: [Emojis.end, Emojis.back],
                     embed: new djs.RichEmbed()
@@ -96,10 +99,10 @@ export default class Config {
                 }
                 allChannels = [];
                 let i = 0
-                desc = voiceChannels.reduce((D: string, c: any) => {
+                desc = voiceChannels.reduce((D: string, c: djs.GuildChannel) => {
                     form.emojis.push(EmojisN[i])
                     allChannels.push(c.id)
-                    D += `${EmojisN[i]} ${c.name} ${gsetttings.channels.includes(c.id) ? Emojis.on : Emojis.off}\n`;
+                    D += `${EmojisN[i]} ${gsetttings.channels.includes(c.id) ? Emojis.on : Emojis.off} ${c.name}\n`;
                     i++;
                     return D;
                 }, "__ Channels :gear: __\n");
@@ -114,13 +117,19 @@ export default class Config {
                 return form
 
             case configFormType.channel:
+                form = {
+                    embed: new djs.RichEmbed()
+                        .setTitle('`Le Fiston 🥃` *__Configuration__*')
+                        .setColor(16711680),
+                    emojis: [Emojis.end, Emojis.back]
+                };
+
                 let { index } = ops;
                 console.log('load form channnel ', index)
                 state = await this.conf;
-                console.log({ state })
                 allChannels = state.data.allChannels
                 let onWorkingChannel: string = allChannels[index];
-                let onWorkingChannelName: any = this.guild.channels.get(onWorkingChannel).name
+                let onWorkingChannelName: string = this.guild.channels.get(onWorkingChannel).name
                 this.conf = Promise.resolve({
                     post: state.post,
                     chan: state.chan,
@@ -128,23 +137,21 @@ export default class Config {
                     data: { allChannels, index, onWorkingChannel }
                 })
                 state = await this.conf;
-                console.log({ state })
                 let nextChannel = state.data.allChannels[index + 1];
                 let prevChannel = state.data.allChannels[index - 1];
-                let conf: any = await this.chanConf;
+                let conf: IChannelsOptions = await this.chanConf;
                 if (!conf) {
                     Channels.addChannel({ id: onWorkingChannel, offline: onWorkingChannelName, guildId: this.guild.id })
                 }
                 conf = await this.chanConf;
-                console.log({ conf })
                 desc =
                     `__ Channel: ${onWorkingChannelName} __\n` +
-                    `${Emojis.mega} to change the chatting ,ame, current \`${conf.names.chatting}\`\n` +
+                    `${Emojis.mega} to change the chatting name, current \`${conf.names.chatting}\`\n` +
                     `${Emojis.mute} to change the offline name, current \`${conf.names.offline}\`\n` +
                     `${Emojis.mic} to change the chatting emoji, current ${conf.emojis.chatting}\n` +
                     `${Emojis.flag} to change the offline emoji, current ${conf.emojis.offline}\n` +
                     `${Emojis.joystick} to change the gaming emoji, current ${conf.emojis.gaming}\n`;
-
+                form.embed.setDescription(desc);
                 if (this.guild.channels.get(prevChannel)) {
                     desc += `${Emojis.arrow_backward} to switch to the prev channel, \`${this.guild.channels.get(prevChannel).name}\`\n`;
                     form.emojis.push(Emojis.arrow_backward)
@@ -153,31 +160,13 @@ export default class Config {
                     desc += `${Emojis.arrow_forward} to switch to the next channel, \`${this.guild.channels.get(nextChannel).name}\`\n`;
                     form.emojis.push(Emojis.arrow_forward);
                 };
-                form = {
-                    embed: new djs.RichEmbed()
-                        .setTitle('`Le Fiston 🥃` *__Configuration__*')
-                        .setDescription(desc)
-                        .setColor(16711680),
-                    emojis: [Emojis.end, Emojis.back]
-                };
+
                 [Emojis.mega, Emojis.mute, Emojis.mic, Emojis.flag, Emojis.joystick].forEach((e: string) => form.emojis.push(e))
                 return form
         }
     }
 
-    async createForm(type: configFormType, ops?: any): Promise<void> {
-        try {
-            console.log({ type })
-            let form = await this.buildForm(type, ops);
-            let reacts = await this.sendForm(form);
-            return this.reactHandler(reacts);
-        } catch (e) {
-            return e;
-        }
-    }
-
-    async sendForm(form: configForm) {
-        console.log({ form })
+    async sendForm(form: configForm): Promise<djs.Collection<string, djs.Emoji | djs.MessageReaction>> {
         let { embed, emojis } = form;
         await this.post.clearReactions();
         await this.post.edit(`${this.member} !`, embed);
@@ -187,13 +176,84 @@ export default class Config {
         return this.continueAwaitingReactions();
     }
 
-    async continueAwaitingReactions() {
+    async createForm(type: configFormType, ops?: any) {
+        try {
+            console.log({ type })
+            let form = await this.buildForm(type, ops);
+            let reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction> = await this.sendForm(form);
+            return this.reactHandler(reacts);
+        } catch (e) {
+            return e;
+        }
+    }
+
+
+
+    async continueAwaitingReactions(): Promise<djs.Collection<string, djs.Emoji | djs.MessageReaction>> {
         return this.post.awaitReactions((r: any, u: any) => !!this.member && r.me && u.id == this.member.id, {
             max: 1
         });
     }
 
-    async reactHandler(reacts: any) {
+    async awaitEmojis(msg?: string, done?: (emoji: string) => void) {
+        let channel = await this.fetchConfigChannel();
+        this.secondPost = (this.secondPost === undefined) ? await channel.send(msg) : await this.secondPost.edit(msg);
+        let reacts = await this.secondPost.awaitReactions((r: any, u: djs.GuildMember) => !!this.member && u.id == this.member.id, {
+            max: 1
+        });
+        let emoji = reacts.first().emoji;
+        if ('requiresColons' in emoji) {
+            this.awaitEmojis('❌ You must react with a __non custom__ emojis', done.bind(this))
+        } else {
+            this.secondPost.delete()
+            done.bind(this)(emoji.name);
+        }
+    }
+
+    async setEmoji(type: EmojisType) {
+        this.awaitEmojis('💬 React this message with a __unicode__ emojis to modify the *' + type + '* emojis', async (emoji: string) => {
+            let chanConfig: IChannelsOptions = await this.chanConf;
+            chanConfig.emojis[type] = emoji;
+            console.log({ chanConfig })
+            this.chanConf = Promise.resolve(chanConfig);
+        })
+    }
+
+
+    async awaitNames(msg?: string, done?: (name: string) => void) {
+        let channel = await this.fetchConfigChannel();
+        this.secondPost = (this.secondPost === undefined) ? await channel.send(msg) : await this.secondPost.edit(msg);
+        let msgs = await channel.awaitMessages((m: djs.Message) => !!this.member && m.author.id == this.member.id, {
+            max: 1
+        });
+        let reply = msgs.first();
+        if (reply.content.length > 30) {
+            this.awaitNames('❌ You must reply with a __30 characters less__ name', done.bind(this))
+        } else {
+            this.secondPost.delete();
+            done.bind(this)(reply.content);
+            reply.delete();
+        }
+    }
+
+    async setName(type: NamesType) {
+        this.awaitNames('💬 Reply to this message with the *' + type + '* name you want to set', async (name: string) => {
+            let chanConfig: IChannelsOptions = await this.chanConf;
+            chanConfig.names[type] = name;
+            console.log({ chanConfig })
+            this.chanConf = Promise.resolve(chanConfig);
+        })
+    }
+    async setPrefix() {
+        this.awaitNames('💬 Reply to this message with the *prefix* you want to set', async (name: string) => {
+            let guild: IGuildOptions = await Guilds.getGuild({ id: this.guild.id });
+            guild.prefix = name;
+            console.log({ guild })
+            Guilds.updateGuild({ id: this.guild.id }, guild);
+        })
+    }
+
+    async reactHandler(reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction>) {
 
         const res = reacts.reduce((L: string, e: any) => {
             if (e.count == 2) L = e.emoji.name;
@@ -204,13 +264,13 @@ export default class Config {
             let index = EmojisN.indexOf(res);
             await this.createForm(configFormType.channel, { index });
         } else {
-            console.log({ state });
             switch (res) {
-                case Emojis.mega: /*  doStuff */; break;
-                case Emojis.mute: /*  doStuff */; break;
-                case Emojis.mic: /*  doStuff */; break;
-                case Emojis.flag: /*  doStuff */; break;
-                case Emojis.joystick: /*  doStuff */; break;
+                case Emojis.prefix: this.setPrefix(); break;
+                case Emojis.mega: this.setName('chatting'); break;
+                case Emojis.mute: this.setName('offline'); break;
+                case Emojis.mic: this.setEmoji('chatting'); break;
+                case Emojis.flag: this.setEmoji('offline'); break;
+                case Emojis.joystick: this.setEmoji('gaming'); break;
                 case Emojis.arrow_forward: this.createForm(configFormType.channel, { index: state.data.index + 1 }); break;
                 case Emojis.arrow_backward: this.createForm(configFormType.channel, { index: state.data.index - 1 }); break;
                 case Emojis.end: this.channel.delete(); break;
@@ -219,7 +279,6 @@ export default class Config {
                 case Emojis.back:
                     if (state.form == configFormType.channels) this.createForm(configFormType.main);
                     else if (state.form == configFormType.channel) this.createForm(configFormType.channels);
-
                     break;
             }
 
@@ -235,17 +294,18 @@ export default class Config {
     }
 
     set conf(configStatePromise: Promise<IconfigState>) {
-        configStatePromise.then(configState => {
+        (async () => {
+            let configState = await configStatePromise;
             Guilds.updateGuild({ id: this.guild.id }, { configState });
-        }).catch(console.error)
+        })();
     }
 
-    get chanConf() {
-        return new Promise<any>(async (resolve, reject) => {
+    get chanConf(): Promise<IChannelsOptions> {
+        return new Promise<IChannelsOptions>(async (resolve, reject) => {
             try {
-                let state: any = await this.conf
-                let id: any = state.data.onWorkingChannel;
-                let chan: any = await Channels.getChannel({ id });
+                let state: IconfigState = await this.conf
+                let id: string = state.data.onWorkingChannel;
+                let chan: IChannelsOptions = await Channels.getChannel({ id });
                 resolve(chan);
             } catch (e) {
                 reject(e)
@@ -253,11 +313,14 @@ export default class Config {
         });
     }
 
-    set chanConf(conf) {
-        this.conf.then((s: any) => {
-            let id: any = s.chan;
-            Channels.updateChannel({ id }, { conf });
-        });
+    set chanConf(chanConfig: Promise<IChannelsOptions>) {
+        (async () => {
+            let state = await this.conf;
+            let conf = await chanConfig;
+            let id = state.data.onWorkingChannel;
+            console.log({ conf })
+            Channels.updateChannel({ id }, conf);
+        })();
     }
 
     async fetchConfigMessage() {
@@ -276,9 +339,9 @@ export default class Config {
 
     async fetchConfigChannel() {
         console.log('FCC...');
-        let configChannel;
+        let configChannel: any;
         try {
-            configChannel = this.guild.channels.find((c: any) => c.name == this.configChannelName);
+            configChannel = this.guild.channels.find((c: any) => c.name == this.configChannelName && c.type == 'text');
             if (!configChannel) throw new Error('no config channel');
             else return configChannel;
         } catch (e) {

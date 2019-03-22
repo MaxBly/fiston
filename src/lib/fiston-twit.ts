@@ -49,11 +49,14 @@ export class TwitBot {
             minutes: n.getMinutes(),
             seconds: n.getSeconds(),
         });
+        /* 
         let ruleDuCul = new schedule.RecurrenceRule();
         ruleDuCul.minute = 0;
         this.jobDuCul = schedule.scheduleJob(ruleDuCul, () => { this.duCul('fiston', 'BotDuCul') })
+        */
     }
 
+    /* 
     async duCul(word: string, author: string) {
         console.log('duCul...')
         try {
@@ -66,6 +69,7 @@ export class TwitBot {
             }
         } catch (e) { console.log(e) }
     }
+    */
 
     async tweet(status: string) {
         return new Promise((resolve, reject) => {

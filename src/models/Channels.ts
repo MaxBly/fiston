@@ -71,8 +71,7 @@ export class Channels {
         } catch (e) { return e }
     }
 
-    static createChannel(channel: { id: string, offline: string, guildId: string }): IChannelsOptions {
-        let { id, offline, guildId } = channel;
+    static createChannel({ id, offline, guildId }: { id: string, offline: string, guildId: string }): IChannelsOptions {
         return {
             _id: new mongoose.Types.ObjectId(),
             id,
@@ -89,14 +88,14 @@ export class Channels {
         }
     }
 
-    static async updateChannel(ops: any, newOps: any) {
+    static async updateChannel(ops: IChannelsOptions, newOps: IChannelsOptions) {
         try {
             await mongoose.connect(this.url, this.options);
             return channels.updateOne(ops, { $set: newOps }).exec()
         } catch (e) { return e }
     }
 
-    static async removeChannel(ops: any) {
+    static async removeChannel(ops: IChannelsOptions) {
         try {
             await mongoose.connect(this.url, this.options);
             return channels.deleteOne(ops).exec()
