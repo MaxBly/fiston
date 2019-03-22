@@ -59,10 +59,8 @@ export default class Config {
             if ((!!this.member) && this.member.hasPermission('ADMINISTRATOR')) {
                 try {
                     this.channel = await this.fetchConfigChannel()
-                    console.log('FCC ok...', this.channel.name);
                     msg.reply('Voyons cela dans mon duplex ' + this.channel);
                     this.post = await this.fetchConfigMessage()
-                    console.log('FCM ok...', this.post.id)
                     this.conf = Promise.resolve({ post: this.post.id, chan: this.channel.id, form: configFormType.main });
                     this.createForm(configFormType.main)
                 } catch (e) { console.error(e) }
@@ -324,9 +322,8 @@ export default class Config {
     }
 
     async fetchConfigMessage() {
-        console.log('FCM...');
-        let state: any = await this.conf;
-        let msg: any;
+        let state: IconfigState = await this.conf;
+        let msg: djs.Message | undefined | null;
         try {
             if (!!this.channel) msg = await this.channel.fetchMessage(state.post);
             if (!msg) throw new Error('no config message');
@@ -338,7 +335,6 @@ export default class Config {
     }
 
     async fetchConfigChannel() {
-        console.log('FCC...');
         let configChannel: any;
         try {
             configChannel = this.guild.channels.find((c: any) => c.name == this.configChannelName && c.type == 'text');

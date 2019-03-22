@@ -83,22 +83,21 @@ export default class Fiston {
     }
 
 
-    chanUpdate(channel: IChannelsOptions) {
-        console.log({ channel })
-        let { id, guildId, names, emojis } = channel;
+    chanUpdate({ id, guildId, names, emojis }: IChannelsOptions) {
         let chan: any = this.bot.guilds.get(guildId).channels.get(id)
-        let members = chan.members.array();
-        let gamesArr = members.reduce((arr: string[], member: any) => {
+        let members: djs.GuildMember[] = chan.members.array();
+        let gamesArr: string[] = members.reduce((arr: string[], member: any) => {
             if (member.presence.game/*  && member.presence.game.type == 0 */) arr.push(member.presence.game.name);
+            return arr;
         }, []);
 
-        let gamesObj = gamesArr.reduce((obj: any, game: string) => {
+        let gamesObj: any = gamesArr.reduce((obj: any, game: string) => {
             if (obj[game]) obj[game]++;
             else obj[game] = 1;
             return obj;
         }, {});
 
-        let result = Object.keys(gamesObj).reduce((res: any, game: string) => {
+        let result: any = Object.keys(gamesObj).reduce((res: any, game: string) => {
             if (gamesObj[game] > res.max) {
                 res.max = gamesObj[game];
                 res.game = game;
