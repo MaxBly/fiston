@@ -39,6 +39,10 @@ export interface configForm {
     embed: djs.RichEmbed,
     emojis: string[]
 }
+export interface formOptions {
+    index?: number,
+    keepEmojis?: boolean
+}
 
 
 export default class Config {
@@ -71,7 +75,7 @@ export default class Config {
         }).apply(this)
     }
 
-    async buildForm(type: configFormType, ops?: any): Promise<configForm> {
+    async buildForm(type: configFormType, ops?: formOptions): Promise<configForm> {
         let desc: string, allChannels: string[], state: IconfigState;
         let form: configForm;
         const gsetttings: IGuildOptions = await Guilds.getGuild({ id: this.guild.id });
@@ -165,23 +169,25 @@ export default class Config {
         }
     }
 
-    async sendForm(form: configForm): Promise<djs.Collection<string, djs.Emoji | djs.MessageReaction>> {
+    async sendForm(form: configForm, keepEmojis?: boolean): Promise<djs.Collection<string, djs.Emoji | djs.MessageReaction>> {
         let { embed, emojis } = form;
-        await this.post.clearReactions();
-        await this.post.edit(`${this.member} !`, embed);
-        for (let e of emojis) {
-            await this.post.react(e);
+        if (!keepEmojis) {
+            await this.post.clearReactions();
+            for (let e of emojis) {
+                await this.post.react(e);
+            }
         }
+        await this.post.edit(`${this.member} !`, embed);
         return this.post.awaitReactions((r: any, u: any) => !!this.member && r.me && u.id == this.member.id, {
             max: 1
         });
     }
 
-    async createForm(type: configFormType, ops?: any) {
+    async createForm(type: configFormType, ops?: formOptions) {
         try {
             console.log({ type })
             let form = await this.buildForm(type, ops);
-            let reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction> = await this.sendForm(form);
+            let reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction> = await this.sendForm(form, ops.keepEmojis);
             return this.reactHandler(reacts);
         } catch (e) {
             return e;
@@ -210,7 +216,7 @@ export default class Config {
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
-        return this.createForm(configFormType.channel, { index })
+        return this.createForm(configFormType.channel, { index, keepEmojis: true })
     }
 
     async awaitNames(msg?: string, done?: (name: string) => void): Promise<any> {
@@ -236,7 +242,7 @@ export default class Config {
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
-        return this.createForm(configFormType.channel, { index })
+        return this.createForm(configFormType.channel, { index, keepEmojis: true })
     }
     async setPrefix() {
         await this.awaitNames('💬 Reply to this message with the *prefix* you want to set', async (name: string) => {
@@ -245,7 +251,7 @@ export default class Config {
             console.log({ guild })
             Guilds.updateGuild({ id: this.guild.id }, guild);
         })
-        return this.createForm(configFormType.main)
+        return this.createForm(configFormType.main, { keepEmojis: true })
     }
 
     async disableChannel(id: string) {
