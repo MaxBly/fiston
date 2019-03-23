@@ -42,7 +42,6 @@ export default class Fiston {
             let args = arg.join(' ');
             switch (cmd.toLowerCase()) {
                 case 'c': new Config(msg); break;
-                case 'd': msg.channel.delete(); break;
             }
         });
         this.bot.login(token)

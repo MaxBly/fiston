@@ -172,7 +172,9 @@ export default class Config {
         for (let e of emojis) {
             await this.post.react(e);
         }
-        return this.continueAwaitingReactions();
+        return this.post.awaitReactions((r: any, u: any) => !!this.member && r.me && u.id == this.member.id, {
+            max: 1
+        });
     }
 
     async createForm(type: configFormType, ops?: any) {
@@ -186,15 +188,7 @@ export default class Config {
         }
     }
 
-
-
-    async continueAwaitingReactions(): Promise<djs.Collection<string, djs.Emoji | djs.MessageReaction>> {
-        return this.post.awaitReactions((r: any, u: any) => !!this.member && r.me && u.id == this.member.id, {
-            max: 1
-        });
-    }
-
-    async awaitEmojis(msg?: string, done?: (emoji: string) => void) {
+    async awaitEmojis(msg?: string, done?: (emoji: string) => void): Promise<any> {
         let channel = await this.fetchConfigChannel();
         this.secondPost = (this.secondPost === undefined) ? await channel.send(msg) : await this.secondPost.edit(msg);
         let reacts = await this.secondPost.awaitReactions((r: any, u: djs.GuildMember) => !!this.member && u.id == this.member.id, {
@@ -202,25 +196,24 @@ export default class Config {
         });
         let emoji = reacts.first().emoji;
         if ('requiresColons' in emoji) {
-            this.awaitEmojis('❌ You must react with a __non custom__ emojis', done.bind(this))
+            return this.awaitEmojis('❌ You must react with a __non custom__ emojis', done.bind(this))
         } else {
-            this.secondPost.delete()
             done.bind(this)(emoji.name);
+            return this.secondPost.delete()
         }
     }
 
     async setEmoji(type: EmojisType, index: number) {
-        this.awaitEmojis('💬 React this message with a __unicode__ emojis to modify the *' + type + '* emojis', async (emoji: string) => {
+        await this.awaitEmojis('💬 React this message with a __unicode__ emojis to modify the *' + type + '* emojis', async (emoji: string) => {
             let chanConfig: IChannelsOptions = await this.chanConf;
             chanConfig.emojis[type] = emoji;
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
-        this.createForm(configFormType.channel, { index })
+        return this.createForm(configFormType.channel, { index })
     }
 
-
-    async awaitNames(msg?: string, done?: (name: string) => void) {
+    async awaitNames(msg?: string, done?: (name: string) => void): Promise<any> {
         let channel = await this.fetchConfigChannel();
         this.secondPost = (this.secondPost === undefined) ? await channel.send(msg) : await this.secondPost.edit(msg);
         let msgs = await channel.awaitMessages((m: djs.Message) => !!this.member && m.author.id == this.member.id, {
@@ -228,38 +221,38 @@ export default class Config {
         });
         let reply = msgs.first();
         if (reply.content.length > 30) {
-            this.awaitNames('❌ You must reply with a __30 characters less__ name', done.bind(this))
+            return this.awaitNames('❌ You must reply with a __30 characters less__ name', done.bind(this))
         } else {
-            this.secondPost.delete();
             done.bind(this)(reply.content);
-            reply.delete();
+            await reply.delete();
+            return this.secondPost.delete();
         }
     }
 
     async setName(type: NamesType, index: number) {
-        this.awaitNames('💬 Reply to this message with the *' + type + '* name you want to set', async (name: string) => {
+        await this.awaitNames('💬 Reply to this message with the *' + type + '* name you want to set', async (name: string) => {
             let chanConfig: IChannelsOptions = await this.chanConf;
             chanConfig.names[type] = name;
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
-        this.createForm(configFormType.channel, { index })
+        return this.createForm(configFormType.channel, { index })
     }
     async setPrefix() {
-        this.awaitNames('💬 Reply to this message with the *prefix* you want to set', async (name: string) => {
+        await this.awaitNames('💬 Reply to this message with the *prefix* you want to set', async (name: string) => {
             let guild: IGuildOptions = await Guilds.getGuild({ id: this.guild.id });
             guild.prefix = name;
             console.log({ guild })
             Guilds.updateGuild({ id: this.guild.id }, guild);
         })
-        this.createForm(configFormType.main)
+        return this.createForm(configFormType.main)
     }
 
     async disableChannel(id: string) {
         let guild = await Guilds.getGuild({ id: this.guild.id });
         guild.channels.splice(guild.channels.indexOf(id), 1);
-        Guilds.updateGuild({ id: this.guild.id }, guild);
-        Channels.removeChannel({ id });
+        await Guilds.updateGuild({ id: this.guild.id }, guild);
+        return Channels.removeChannel({ id });
     }
 
     async reactHandler(reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction>) {
