@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "tsc && node dist/fiston.js",
-    "debug": "concurrently --kill-others \"tsc -w\" \"nodemon dist/fiston.js\""
+    "test": "concurrently --kill-others \"tsc -w\" \"nodemon dist/fiston.js\""
   },
   "repository": {
     "type": "git",

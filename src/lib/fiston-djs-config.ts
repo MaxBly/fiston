@@ -3,6 +3,7 @@ import { Channels, IChannelsOptions } from '../models/Channels'
 import { Guilds, IGuildOptions } from '../models/Guilds'
 import { IncomingHttpHeaders } from 'http';
 import { Collection } from 'mongoose';
+import { stat } from 'fs';
 
 const EmojisN = ['0⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 const Emojis = {
@@ -159,7 +160,7 @@ export default class Config {
                     form.emojis.push(Emojis.arrow_forward);
                 };
 
-                [Emojis.mega, Emojis.mute, Emojis.mic, Emojis.flag, Emojis.joystick].forEach((e: string) => form.emojis.push(e))
+                [Emojis.del, Emojis.mega, Emojis.mute, Emojis.mic, Emojis.flag, Emojis.joystick].forEach((e: string) => form.emojis.push(e))
                 return form
         }
     }
@@ -208,13 +209,14 @@ export default class Config {
         }
     }
 
-    async setEmoji(type: EmojisType) {
+    async setEmoji(type: EmojisType, index: number) {
         this.awaitEmojis('💬 React this message with a __unicode__ emojis to modify the *' + type + '* emojis', async (emoji: string) => {
             let chanConfig: IChannelsOptions = await this.chanConf;
             chanConfig.emojis[type] = emoji;
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
+        this.createForm(configFormType.channel, { index })
     }
 
 
@@ -234,13 +236,14 @@ export default class Config {
         }
     }
 
-    async setName(type: NamesType) {
+    async setName(type: NamesType, index: number) {
         this.awaitNames('💬 Reply to this message with the *' + type + '* name you want to set', async (name: string) => {
             let chanConfig: IChannelsOptions = await this.chanConf;
             chanConfig.names[type] = name;
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
+        this.createForm(configFormType.channel, { index })
     }
     async setPrefix() {
         this.awaitNames('💬 Reply to this message with the *prefix* you want to set', async (name: string) => {
@@ -249,6 +252,14 @@ export default class Config {
             console.log({ guild })
             Guilds.updateGuild({ id: this.guild.id }, guild);
         })
+        this.createForm(configFormType.main)
+    }
+
+    async disableChannel(id: string) {
+        let guild = await Guilds.getGuild({ id: this.guild.id });
+        guild.channels.splice(guild.channels.indexOf(id), 1);
+        Guilds.updateGuild({ id: this.guild.id }, guild);
+        Channels.removeChannel({ id });
     }
 
     async reactHandler(reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction>) {
@@ -264,16 +275,16 @@ export default class Config {
         } else {
             switch (res) {
                 case Emojis.prefix: this.setPrefix(); break;
-                case Emojis.mega: this.setName('chatting'); break;
-                case Emojis.mute: this.setName('offline'); break;
-                case Emojis.mic: this.setEmoji('chatting'); break;
-                case Emojis.flag: this.setEmoji('offline'); break;
-                case Emojis.joystick: this.setEmoji('gaming'); break;
+                case Emojis.del: this.disableChannel(state.data.onWorkingChannel); break;
+                case Emojis.mega: this.setName('chatting', state.data.index); break;
+                case Emojis.mute: this.setName('offline', state.data.index); break;
+                case Emojis.mic: this.setEmoji('chatting', state.data.index); break;
+                case Emojis.flag: this.setEmoji('offline', state.data.index); break;
+                case Emojis.joystick: this.setEmoji('gaming', state.data.index); break;
                 case Emojis.arrow_forward: this.createForm(configFormType.channel, { index: state.data.index + 1 }); break;
                 case Emojis.arrow_backward: this.createForm(configFormType.channel, { index: state.data.index - 1 }); break;
                 case Emojis.end: this.channel.delete(); break;
                 case Emojis.gear: this.createForm(configFormType.channels); break;
-                case Emojis.prefix: await this.channel.send(res); break;
                 case Emojis.back:
                     if (state.form == configFormType.channels) this.createForm(configFormType.main);
                     else if (state.form == configFormType.channel) this.createForm(configFormType.channels);
