@@ -244,6 +244,7 @@ export default class Config {
         })
         return this.createForm(configFormType.channel, { index, keepEmojis: true })
     }
+
     async setPrefix() {
         await this.awaitNames('💬 Reply to this message with the *prefix* you want to set', async (name: string) => {
             let guild: IGuildOptions = await Guilds.getGuild({ id: this.guild.id });
@@ -258,7 +259,14 @@ export default class Config {
         let guild = await Guilds.getGuild({ id: this.guild.id });
         guild.channels.splice(guild.channels.indexOf(id), 1);
         await Guilds.updateGuild({ id: this.guild.id }, guild);
-        return Channels.removeChannel({ id });
+        await Channels.removeChannel({ id });
+        return this.createForm(configFormType.channels);
+    }
+
+    async enableChannel(id: string, index: number) {
+        let guild = await Guilds.getGuild({ id: this.guild.id });
+        await Channels.addChannel({ id, offline: this.guild.channels.get(id).name, guildId: guild.id })
+        return this.createForm(configFormType.channel, { index });
     }
 
     async reactHandler(reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction>) {
@@ -275,6 +283,7 @@ export default class Config {
             switch (res) {
                 case Emojis.prefix: this.setPrefix(); break;
                 case Emojis.del: this.disableChannel(state.data.onWorkingChannel); break;
+                case Emojis.add: this.enableChannel(state.data.onWorkingChannel, state.data.index); break;
                 case Emojis.mega: this.setName('chatting', state.data.index); break;
                 case Emojis.mute: this.setName('offline', state.data.index); break;
                 case Emojis.mic: this.setEmoji('chatting', state.data.index); break;
