@@ -1,6 +1,5 @@
 import djs, { ChannelData, Guild } from 'discord.js'
 import schedule from 'node-schedule'
-import fs from 'fs'
 import { Channels, IChannelsOptions } from '../models/Channels'
 import { Guilds, IGuildOptions } from '../models/Guilds'
 import Config from './fiston-djs-config'
@@ -36,13 +35,18 @@ export default class Fiston {
 
         this.bot.on('voiceStateUpdate', this.chanUpdaterHandler.bind(this));
         this.bot.on('presenceUpdate', this.chanUpdaterHandler.bind(this));
-        this.bot.on('message', (msg: any) => {
-            let cmd = msg.content.substring(1).split(' ')[0];
-            let arg = msg.content.split(' ').slice(1);
-            let args = arg.join(' ');
-            switch (cmd.toLowerCase()) {
-                case 'c': this.createConfig(msg); break;
-                case 'd': this.clear(msg); break;
+        this.bot.on('message', async (msg: djs.Message) => {
+            let guild = await Guilds.getGuild({ id: msg.guild.id })
+            let prefix = ('prefix' in guild) ? guild.prefix : '!';
+            if (msg.content.startsWith(prefix)) {
+
+                let cmd = msg.content.substring(prefix.length).split(' ')[0];
+                let arg = msg.content.split(' ').slice(1);
+                let args = arg.join(' ');
+                switch (cmd.toLowerCase()) {
+                    case 'config': this.createConfig(msg); break;
+                    case 'cbi': this.clear(msg); break;
+                }
             }
         });
         this.bot.login(token)
@@ -65,7 +69,6 @@ export default class Fiston {
 
 
     async chanUpdaterHandler(oldm: any, newm: any) {
-        console.log('handled')
         try {
             Guilds.getGuildChannels({ id: newm.guild.id }, this.chanUpdate.bind(this))
         } catch (e) { console.log(e) }
@@ -103,7 +106,7 @@ export default class Fiston {
         let chan: any = this.bot.guilds.get(guildId).channels.get(id)
         let members: djs.GuildMember[] = chan.members.array();
         let gamesArr: string[] = members.reduce((arr: string[], member: any) => {
-            if (member.presence.game/*  && member.presence.game.type == 0 */) arr.push(member.presence.game.name);
+            if (member.presence.game && member.presence.game.type == 0) arr.push(member.presence.game.name);
             return arr;
         }, []);
 
@@ -127,7 +130,6 @@ export default class Fiston {
         } else {
             chan.setName(`${emojis.offline} ${names.offline}`);
         }
-        console.log({ result })
     }
 
 }

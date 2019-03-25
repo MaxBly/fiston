@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-import { Channels, channels, IChannelsOptions } from './Channels'
-import { ObjectId } from 'bson';
+import { Channels, IChannelsOptions } from './Channels'
+import { MongoError } from 'mongodb';
 
 
 const guildSchema = new mongoose.Schema({
@@ -50,7 +50,10 @@ export class Guilds {
         try {
             await mongoose.connect(this.url, this.options);
             return guilds.findOne(ops).exec()
-        } catch (e) { console.error(e) }
+        } catch (e) {
+            if (('name' in e) && (e.name == 'MongoNetworkError')) process.exit(1);
+            console.error('MongoNetworkError', e)
+        }
     }
 
     static async getGuildChannels(ops: IGuildOptions, cb: (channel: IChannelsOptions) => void) {
@@ -58,12 +61,13 @@ export class Guilds {
 
             let guild: IGuildOptions = await this.getGuild(ops)
             if (!guild) throw new Error('Guild not found')
-            console.log('getGuildChannels', { guild })
             guild.channels.forEach(async (id: string) => {
                 let channel = await Channels.getChannel({ id });
                 cb(channel)
             })
-        } catch (e) { console.error(e) }
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     static createGuild(id: string): IGuildOptions {

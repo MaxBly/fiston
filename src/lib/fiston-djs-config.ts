@@ -128,7 +128,6 @@ export default class Config {
                         emojis: [Emojis.end, Emojis.back]
                     };
                     let { index } = ops;
-                    console.log('load form channnel ', index)
                     state = await this.conf;
                     allChannels = state.data.allChannels
                     let onWorkingChannel: string = allChannels[index];
@@ -195,7 +194,6 @@ export default class Config {
 
     async createForm(type: configFormType, ops: formOptions = {}) {
         try {
-            console.log({ type })
             let form = await this.buildForm(type, ops);
             let reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction>;
             if ('keepEmojis' in ops) reacts = await this.sendForm(form, ops.keepEmojis);
