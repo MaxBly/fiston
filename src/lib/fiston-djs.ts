@@ -41,11 +41,28 @@ export default class Fiston {
             let arg = msg.content.split(' ').slice(1);
             let args = arg.join(' ');
             switch (cmd.toLowerCase()) {
-                case 'c': new Config(msg); break;
+                case 'c': this.createConfig(msg); break;
+                case 'd': this.clear(msg); break;
             }
         });
         this.bot.login(token)
     }
+
+    async createConfig(msg: djs.Message) {
+        new Config(msg);
+
+    }
+
+
+    async clear(msg: djs.Message) {
+        let member = msg.guild.members.get(msg.author.id)
+        if (member.hasPermission('ADMINISTRATOR')) {
+            let msgs = await msg.channel.fetchMessages({})
+            msgs.filter((m: djs.Message) => m.author.id == this.bot.user.id || m.author.id == msg.author.id)
+                .map((m: djs.Message) => m.delete());
+        }
+    }
+
 
     async chanUpdaterHandler(oldm: any, newm: any) {
         console.log('handled')

@@ -1,9 +1,6 @@
 import djs from 'discord.js'
 import { Channels, IChannelsOptions } from '../models/Channels'
 import { Guilds, IGuildOptions } from '../models/Guilds'
-import { IncomingHttpHeaders } from 'http';
-import { Collection } from 'mongoose';
-import { stat } from 'fs';
 
 const EmojisN = ['0⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 const Emojis = {
@@ -63,14 +60,17 @@ export default class Config {
         (async () => {
             if ((!!this.member) && this.member.hasPermission('ADMINISTRATOR')) {
                 try {
+                    let gset = await Guilds.getGuild({ id: this.guild.id })
+                    if (!gset) await Guilds.addGuild(this.guild.id)
                     this.channel = await this.fetchConfigChannel()
                     msg.reply('Voyons cela dans mon duplex ' + this.channel);
+                    msg.delete();
                     this.post = await this.fetchConfigMessage()
                     this.conf = Promise.resolve({ post: this.post.id, chan: this.channel.id, form: configFormType.main });
                     this.createForm(configFormType.main)
                 } catch (e) { console.error(e) }
             } else {
-                msg.reply('nop t pas admin fdp');
+                msg.reply('❌ You must be admin to use the config command');
             }
         }).apply(this)
     }
@@ -100,8 +100,8 @@ export default class Config {
                         .setTitle('`Le Fiston 🥃` *__Configuration__*')
                         .setColor(16711680)
                 }
+                let i = 0;
                 allChannels = [];
-                let i = 0
                 desc = voiceChannels.reduce((D: string, c: djs.GuildChannel) => {
                     form.emojis.push(EmojisN[i])
                     allChannels.push(c.id)
@@ -126,13 +126,13 @@ export default class Config {
                         .setColor(16711680),
                     emojis: [Emojis.end, Emojis.back]
                 };
-
                 let { index } = ops;
                 console.log('load form channnel ', index)
                 state = await this.conf;
                 allChannels = state.data.allChannels
                 let onWorkingChannel: string = allChannels[index];
                 let onWorkingChannelName: string = this.guild.channels.get(onWorkingChannel).name
+
                 this.conf = Promise.resolve({
                     post: state.post,
                     chan: state.chan,
@@ -143,18 +143,22 @@ export default class Config {
                 let nextChannel = state.data.allChannels[index + 1];
                 let prevChannel = state.data.allChannels[index - 1];
                 let conf: IChannelsOptions = await this.chanConf;
-                if (!conf) {
-                    Channels.addChannel({ id: onWorkingChannel, offline: onWorkingChannelName, guildId: this.guild.id })
-                }
+                if (!conf) Channels.addChannel({ id: onWorkingChannel, offline: onWorkingChannelName, guildId: this.guild.id })
                 conf = await this.chanConf;
-                desc =
-                    `__ Channel: ${onWorkingChannelName} __\n` +
-                    `${Emojis.mega} to change the chatting name, current \`${conf.names.chatting}\`\n` +
-                    `${Emojis.mute} to change the offline name, current \`${conf.names.offline}\`\n` +
-                    `${Emojis.mic} to change the chatting emoji, current ${conf.emojis.chatting}\n` +
-                    `${Emojis.flag} to change the offline emoji, current ${conf.emojis.offline}\n` +
-                    `${Emojis.joystick} to change the gaming emoji, current ${conf.emojis.gaming}\n`;
-                form.embed.setDescription(desc);
+                let isEnabled = gsetttings.channels.includes(onWorkingChannel);
+                desc = `__ Channel: ${onWorkingChannelName} __\n`;
+                if (isEnabled) {
+                    desc +=
+                        `${Emojis.mega} to change the chatting name, current \`${conf.names.chatting}\`\n` +
+                        `${Emojis.mute} to change the offline name, current \`${conf.names.offline}\`\n` +
+                        `${Emojis.mic} to change the chatting emoji, current ${conf.emojis.chatting}\n` +
+                        `${Emojis.flag} to change the offline emoji, current ${conf.emojis.offline}\n` +
+                        `${Emojis.joystick} to change the gaming emoji, current ${conf.emojis.gaming}\n` +
+                        `${Emojis.del} to disable this channel\n`;
+                } else {
+                    desc += `${Emojis.add} to enable this channel\n`;
+                }
+
                 if (this.guild.channels.get(prevChannel)) {
                     desc += `${Emojis.arrow_backward} to switch to the prev channel, \`${this.guild.channels.get(prevChannel).name}\`\n`;
                     form.emojis.push(Emojis.arrow_backward)
@@ -163,8 +167,10 @@ export default class Config {
                     desc += `${Emojis.arrow_forward} to switch to the next channel, \`${this.guild.channels.get(nextChannel).name}\`\n`;
                     form.emojis.push(Emojis.arrow_forward);
                 };
+                form.embed.setDescription(desc);
 
-                [Emojis.del, Emojis.mega, Emojis.mute, Emojis.mic, Emojis.flag, Emojis.joystick].forEach((e: string) => form.emojis.push(e))
+                if (isEnabled) [Emojis.del, Emojis.mega, Emojis.mute, Emojis.mic, Emojis.flag, Emojis.joystick].forEach((e: string) => form.emojis.push(e))
+                else form.emojis.push(Emojis.add);
                 return form
         }
     }
@@ -183,14 +189,16 @@ export default class Config {
         });
     }
 
-    async createForm(type: configFormType, ops?: formOptions) {
+    async createForm(type: configFormType, ops: formOptions = {}) {
         try {
             console.log({ type })
             let form = await this.buildForm(type, ops);
-            let reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction> = await this.sendForm(form, ops.keepEmojis);
+            let reacts: djs.Collection<string, djs.Emoji | djs.MessageReaction>;
+            if ('keepEmojis' in ops) reacts = await this.sendForm(form, ops.keepEmojis);
+            else reacts = await this.sendForm(form)
             return this.reactHandler(reacts);
         } catch (e) {
-            return e;
+            console.error(e);
         }
     }
 
@@ -216,7 +224,7 @@ export default class Config {
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
-        return this.createForm(configFormType.channel, { index, keepEmojis: true })
+        return this.createForm(configFormType.channel, { index, keepEmojis: /* true */ false })
     }
 
     async awaitNames(msg?: string, done?: (name: string) => void): Promise<any> {
@@ -242,7 +250,7 @@ export default class Config {
             console.log({ chanConfig })
             this.chanConf = Promise.resolve(chanConfig);
         })
-        return this.createForm(configFormType.channel, { index, keepEmojis: true })
+        return this.createForm(configFormType.channel, { index, keepEmojis: /* true */ false })
     }
 
     async setPrefix() {
@@ -252,7 +260,7 @@ export default class Config {
             console.log({ guild })
             Guilds.updateGuild({ id: this.guild.id }, guild);
         })
-        return this.createForm(configFormType.main, { keepEmojis: true })
+        return this.createForm(configFormType.main, { keepEmojis: /* true */ false })
     }
 
     async disableChannel(id: string) {
@@ -265,6 +273,8 @@ export default class Config {
 
     async enableChannel(id: string, index: number) {
         let guild = await Guilds.getGuild({ id: this.guild.id });
+        await guild.channels.push(id);
+        await Guilds.updateGuild({ id: this.guild.id }, guild)
         await Channels.addChannel({ id, offline: this.guild.channels.get(id).name, guildId: guild.id })
         return this.createForm(configFormType.channel, { index });
     }
