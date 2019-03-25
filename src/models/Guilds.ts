@@ -43,14 +43,14 @@ export class Guilds {
         try {
             await mongoose.connect(this.url, this.options);
             return guilds.find(ops).exec();
-        } catch (e) { return e }
+        } catch (e) { console.error(e) }
     }
 
     static async getGuild(ops?: IGuildOptions): Promise<IGuildOptions> {
         try {
             await mongoose.connect(this.url, this.options);
             return guilds.findOne(ops).exec()
-        } catch (e) { return e }
+        } catch (e) { console.error(e) }
     }
 
     static async getGuildChannels(ops: IGuildOptions, cb: (channel: IChannelsOptions) => void) {
@@ -80,25 +80,24 @@ export class Guilds {
     static async addGuild(guildId: string) {
         try {
             let G = this.createGuild(guildId);
-            console.log(G)
             await mongoose.connect(this.url, this.options);
             let newGuild = new guilds(G);
             return newGuild.save();
-        } catch (e) { return e }
+        } catch (e) { console.error(e) }
     }
 
     static async updateGuild(ops: IGuildOptions, newOps: IGuildOptions) {
         try {
             await mongoose.connect(this.url, this.options);
             return guilds.updateOne(ops, { $set: newOps }).exec()
-        } catch (e) { return e }
+        } catch (e) { console.error(e) }
     }
 
     static async removeGuild(ops: IGuildOptions) {
         try {
             await mongoose.connect(this.url, this.options);
             return guilds.deleteOne(ops).exec()
-        } catch (e) { return e }
+        } catch (e) { console.error(e) }
     }
 }
 
