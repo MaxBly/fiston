@@ -34,6 +34,8 @@ export default class Fiston {
         });
 
         this.bot.on('voiceStateUpdate', this.chanUpdaterHandler.bind(this));
+        this.bot.on('guildCreate', ({ id }: { id: djs.Snowflake }) => Guilds.addGuild(id));
+        this.bot.on('guildDelete', ({ id }: { id: djs.Snowflake }) => Guilds.removeGuild({ id }));
         this.bot.on('presenceUpdate', this.chanUpdaterHandler.bind(this));
         this.bot.on('message', async (msg: djs.Message) => {
             let guild = await Guilds.getGuild({ id: msg.guild.id })
@@ -54,7 +56,6 @@ export default class Fiston {
 
     async createConfig(msg: djs.Message) {
         new Config(msg);
-
     }
 
 

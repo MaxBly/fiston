@@ -179,13 +179,13 @@ export default class Config {
     async sendForm(form: configForm, keepEmojis?: boolean): Promise<djs.Collection<string, djs.Emoji | djs.MessageReaction>> {
         try {
             let { embed, emojis } = form;
+            this.post.edit(`${this.member} !`, embed);
             if (!keepEmojis) {
                 await this.post.clearReactions();
                 for (let e of emojis) {
                     await this.post.react(e);
                 }
             }
-            await this.post.edit(`${this.member} !`, embed);
             return this.post.awaitReactions((r: any, u: any) => !!this.member && r.me && u.id == this.member.id, {
                 max: 1
             });
@@ -228,7 +228,7 @@ export default class Config {
                 chanConfig.emojis[type] = emoji;
                 this.chanConf = Promise.resolve(chanConfig);
             })
-            return this.createForm(configFormType.channel, { index, keepEmojis: /* true */ false })
+            return this.createForm(configFormType.channel, { index })
         } catch (e) { console.error(e) }
     }
 
@@ -257,7 +257,7 @@ export default class Config {
                 chanConfig.names[type] = name;
                 this.chanConf = Promise.resolve(chanConfig);
             })
-            return this.createForm(configFormType.channel, { index, keepEmojis: /* true */ false })
+            return this.createForm(configFormType.channel, { index })
         } catch (e) { console.error(e) }
     }
 
@@ -268,7 +268,7 @@ export default class Config {
                 guild.prefix = name;
                 Guilds.updateGuild({ id: this.guild.id }, guild);
             })
-            return this.createForm(configFormType.main, { keepEmojis: /* true */ false })
+            return this.createForm(configFormType.main)
         } catch (e) { console.error(e) }
     }
 
