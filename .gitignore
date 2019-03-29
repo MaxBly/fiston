@@ -1,6 +1,7 @@
 json/
 .vscode/
 test.js
+dist/
 
 # Logs
 logs
