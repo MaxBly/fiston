@@ -1,4 +1,4 @@
-const socket = io.connect('http://fiston.bly-net.com/');
+const socket = io.connect('http://bly-net.com:7000/');
 // const socket = io.connect('http://localhost:7000');
 
 const table = document.createElement('table');
