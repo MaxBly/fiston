@@ -22,15 +22,12 @@ export interface IChannelData {
 
 export default class Fiston {
     bot: djs.Client;
-
+    config: Config;
     constructor(token?: string) {
         this.bot = new djs.Client();
         this.bot.on('ready', async () => {
             console.log('ready')
-            let guilds = await Guilds.getGuilds({});
-            guilds.forEach(({ id }) => {
-                Guilds.getGuildChannels({ id }, this.chanUpdate.bind(this))
-            });
+            this.reloadsChannels();
         });
 
         this.bot.on('voiceStateUpdate', this.chanUpdaterHandler.bind(this));
@@ -47,32 +44,25 @@ export default class Fiston {
                     let arg = msg.content.split(' ').slice(1);
                     let args = arg.join(' ');
                     switch (cmd.toLowerCase()) {
-                        case 'config': this.createConfig(msg); break;
+                        case 'config': this.config = new Config(msg, this.reloadsChannels.bind(this)); break;
                         case 'cbi': this.clear(msg); break;
                     }
                 }
 
             } catch (e) {
-                if (msg.content.startsWith('!')) {
-
-                    let cmd = msg.content.substring(1).split(' ')[0];
-                    let arg = msg.content.split(' ').slice(1);
-                    let args = arg.join(' ');
-                    switch (cmd.toLowerCase()) {
-                        case 'config': this.createConfig(msg); break;
-                        case 'cbi': this.clear(msg); break;
-                    }
-                }
+                console.error(e)
 
             }
         });
         this.bot.login(token)
     }
 
-    async createConfig(msg: djs.Message) {
-        new Config(msg);
+    async reloadsChannels() {
+        let guilds = await Guilds.getGuilds({});
+        guilds.forEach(({ id }) => {
+            Guilds.getGuildChannels({ id }, this.chanUpdate.bind(this))
+        });
     }
-
 
     async clear(msg: djs.Message) {
         let member = msg.guild.members.get(msg.author.id)

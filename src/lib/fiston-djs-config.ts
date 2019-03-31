@@ -50,7 +50,7 @@ export default class Config {
     post: djs.Message | undefined;
     secondPost: djs.Message | undefined;
 
-    constructor(msg: djs.Message) {
+    constructor(msg: djs.Message, public reloadsChannels: () => void) {
         let self = this;
         let authorId = msg.author.id;
         this.member = msg.guild.members.get(authorId);
@@ -245,7 +245,9 @@ export default class Config {
             } else {
                 done.bind(this)(reply.content);
                 await reply.delete();
-                return this.secondPost.delete();
+                await this.secondPost.delete();
+                this.secondPost = undefined;
+                return;
             }
         } catch (e) { console.error(e) }
     }
@@ -347,6 +349,7 @@ export default class Config {
                 let state: IconfigState = await this.conf
                 let id: string = state.data.onWorkingChannel;
                 let chan: IChannelsOptions = await Channels.getChannel({ id });
+                this.reloadsChannels();
                 resolve(chan);
             } catch (e) {
                 reject(e)

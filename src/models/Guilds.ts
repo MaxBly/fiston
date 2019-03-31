@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import { Channels, IChannelsOptions } from './Channels'
-import { MongoError } from 'mongodb';
 
 
 const guildSchema = new mongoose.Schema({
@@ -58,7 +57,6 @@ export class Guilds {
 
     static async getGuildChannels(ops: IGuildOptions, cb: (channel: IChannelsOptions) => void) {
         try {
-
             let guild: IGuildOptions = await this.getGuild(ops)
             if (!guild) throw new Error('Guild not found')
             guild.channels.forEach(async (id: string) => {
