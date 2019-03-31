@@ -38,17 +38,32 @@ export default class Fiston {
         this.bot.on('guildDelete', ({ id }: { id: djs.Snowflake }) => Guilds.removeGuild({ id }));
         this.bot.on('presenceUpdate', this.chanUpdaterHandler.bind(this));
         this.bot.on('message', async (msg: djs.Message) => {
-            let guild = await Guilds.getGuild({ id: msg.guild.id })
-            let prefix = ('prefix' in guild) ? guild.prefix : '!';
-            if (msg.content.startsWith(prefix)) {
+            try {
+                let guild = await Guilds.getGuild({ id: msg.guild.id })
+                let prefix = ('prefix' in guild) ? guild.prefix : '!';
+                if (msg.content.startsWith(prefix)) {
 
-                let cmd = msg.content.substring(prefix.length).split(' ')[0];
-                let arg = msg.content.split(' ').slice(1);
-                let args = arg.join(' ');
-                switch (cmd.toLowerCase()) {
-                    case 'config': this.createConfig(msg); break;
-                    case 'cbi': this.clear(msg); break;
+                    let cmd = msg.content.substring(prefix.length).split(' ')[0];
+                    let arg = msg.content.split(' ').slice(1);
+                    let args = arg.join(' ');
+                    switch (cmd.toLowerCase()) {
+                        case 'config': this.createConfig(msg); break;
+                        case 'cbi': this.clear(msg); break;
+                    }
                 }
+
+            } catch (e) {
+                if (msg.content.startsWith('!')) {
+
+                    let cmd = msg.content.substring(1).split(' ')[0];
+                    let arg = msg.content.split(' ').slice(1);
+                    let args = arg.join(' ');
+                    switch (cmd.toLowerCase()) {
+                        case 'config': this.createConfig(msg); break;
+                        case 'cbi': this.clear(msg); break;
+                    }
+                }
+
             }
         });
         this.bot.login(token)
