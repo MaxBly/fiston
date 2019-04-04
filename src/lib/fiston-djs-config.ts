@@ -1,6 +1,7 @@
 import djs from 'discord.js'
 import { Channels, IChannelsOptions } from '../models/Channels'
 import { Guilds, IGuildOptions } from '../models/Guilds'
+import form from 'djs-forms'
 
 const EmojisN = ['0⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 const Emojis = {
@@ -60,6 +61,7 @@ export default class Config {
         (async () => {
             if ((!!this.member) && this.member.hasPermission('ADMINISTRATOR')) {
                 try {
+
                     let gset = await Guilds.getGuild({ id: this.guild.id })
                     if (!gset) await Guilds.addGuild(this.guild.id)
                     this.channel = await this.fetchConfigChannel()
@@ -213,9 +215,9 @@ export default class Config {
             });
             let emoji = reacts.first().emoji;
             if ('requiresColons' in emoji) {
-                return this.awaitEmojis('❌ You must react with a __non custom__ emojis', done.bind(this))
+                return this.awaitEmojis('❌ You must react with a __non custom__ emojis', done)
             } else {
-                done.bind(this)(emoji.name);
+                done(emoji.name);
                 return this.secondPost.delete()
             }
         } catch (e) { console.error(e) }
@@ -243,7 +245,7 @@ export default class Config {
             if (reply.content.length > 30) {
                 return this.awaitNames('❌ You must reply with a __30 characters less__ name', done.bind(this))
             } else {
-                done.bind(this)(reply.content);
+                done(reply.content);
                 await reply.delete();
                 await this.secondPost.delete();
                 this.secondPost = undefined;
