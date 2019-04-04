@@ -43,6 +43,7 @@
     "socket.io": "^2.2.0",
     "string": "^3.3.3",
     "twit": "^2.2.11",
-    "word-definition": "^2.1.6"
+    "word-definition": "^2.1.6",
+    "ytdl-core-discord": "^1.0.3"
   }
 }
