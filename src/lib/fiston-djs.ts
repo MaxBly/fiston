@@ -3,10 +3,7 @@ import schedule from 'node-schedule'
 import { Channels, IChannelsOptions } from '../models/Channels'
 import { Guilds, IGuildOptions } from '../models/Guilds'
 import Config from './fiston-djs-config'
-import ytdl from 'ytdl-core-discord';
-
-
-
+import Player from './fiston-djs-player'
 const emojis = { flag: "🏳", mic: "🎙", joystick: "🕹" }
 
 export interface IChannelData {
@@ -26,6 +23,7 @@ export interface IChannelData {
 export default class Fiston {
     bot: djs.Client;
     config: Config;
+    player: Player;
     constructor(token?: string) {
         this.bot = new djs.Client();
         this.bot.on('ready', async () => {
@@ -49,7 +47,7 @@ export default class Fiston {
                     switch (cmd.toLowerCase()) {
                         case 'config': this.config = new Config(msg, this.reloadsChannels.bind(this)); break;
                         case 'cbi': this.clear(msg); break;
-                        case 'play': this.play(msg, arg[0]); break;
+                        case 'play': this.play(msg); break;
                     }
                 }
 
@@ -68,14 +66,10 @@ export default class Fiston {
         });
     }
 
-    async play(msg: djs.Message, url: string) {
+    async play(msg: djs.Message) {
         try {
-            if (msg.member.voiceChannel) {
-                let connection = await msg.member.voiceChannel.join();
-                connection.playOpusStream(await ytdl(url));
-            }
-
-
+            this.player = new Player(msg.client, msg.guild)
+            this.player.open(msg.member.voiceChannel)
         } catch (e) { console.error(e) }
     }
 

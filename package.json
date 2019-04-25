@@ -33,7 +33,7 @@
     "concurrently": "^4.1.0",
     "cors": "^2.8.5",
     "discord.js": "^11.4.2",
-    "djs-forms": "^1.0.0",
+    "djs-forms": "^1.0.20",
     "dotenv": "^6.2.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
@@ -45,6 +45,7 @@
     "string": "^3.3.3",
     "twit": "^2.2.11",
     "word-definition": "^2.1.6",
+    "yt-search": "^0.4.1",
     "ytdl-core-discord": "^1.0.3"
   }
 }
