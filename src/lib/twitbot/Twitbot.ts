@@ -1,7 +1,7 @@
 import express from 'express'
 import Twit from 'twit'
 import schedule from 'node-schedule'
-import { Words } from '../models/Words'
+import { Words } from '../../models/Words'
 
 export interface time { h: number, m: number }
 
@@ -10,7 +10,7 @@ export class TwitBot {
     router: express.Router;
     job: schedule.Job;
     rule: schedule.RecurrenceRule;
-    jobDuCul: schedule.Job;
+    //jobDuCul: schedule.Job;
     constructor(tokens: any, time: time) {
         this.twit = new Twit({
             consumer_key: tokens.consumer.key,

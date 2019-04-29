@@ -1,3 +1,3 @@
-import Queue from './fiston-djs-player-queue'
+import Queue from './djs/Queue'
 
 

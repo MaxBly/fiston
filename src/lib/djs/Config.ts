@@ -1,6 +1,6 @@
 import djs from 'discord.js'
-import { Channels, IChannelsOptions } from '../models/Channels'
-import { Guilds, IGuildOptions } from '../models/Guilds'
+import { Channels, IChannelsOptions } from '../../models/Channels'
+import { Guilds, IGuildOptions } from '../../models/Guilds'
 import form, { Post, StateProvider } from 'djs-forms'
 
 const EmojisN = ['0⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']

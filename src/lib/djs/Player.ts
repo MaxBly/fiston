@@ -1,7 +1,7 @@
 import djs, { VoiceChannel, VoiceConnection, StreamDispatcher } from 'discord.js'
 import form, { StateProvider } from 'djs-forms'
 import Form from 'djs-forms';
-import Queue, { ItemData } from './fiston-djs-player-queue'
+import Queue, { ItemData } from './Queue'
 import yt from 'yt-search';
 import ytdl from 'ytdl-core-discord';
 

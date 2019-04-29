@@ -1,9 +1,9 @@
 import djs, { ChannelData, Guild } from 'discord.js'
 import schedule from 'node-schedule'
-import { Channels, IChannelsOptions } from '../models/Channels'
-import { Guilds, IGuildOptions } from '../models/Guilds'
-import Config from './fiston-djs-config'
-import Player from './fiston-djs-player'
+import { Channels, IChannelsOptions } from '../../models/Channels'
+import { Guilds, IGuildOptions } from '../../models/Guilds'
+import Config from './Config'
+import Player from './Player'
 const emojis = { flag: "🏳", mic: "🎙", joystick: "🕹" }
 
 export interface IChannelData {

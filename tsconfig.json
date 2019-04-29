@@ -55,8 +55,13 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
   "include": [
-    "./src/*",
-    "./src/lib/*"
+    "./src/Fiston-Discord.ts",
+    "./src/Fiston-Twitbot.ts",
+    "src/lib/djs/Config.ts",
+    "src/lib/djs/Queue.ts",
+    "src/lib/djs/Main.ts",
+    "src/lib/djs/Player.ts",
+    "src/lib/twitbot/Twitbot.ts"
   ],
   "exclude": [
     "./dist/*",

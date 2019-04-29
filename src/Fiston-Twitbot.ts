@@ -4,9 +4,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import socket from "socket.io";
-//const wd = require('word-definition');
-//const words = require('./json/words.json');
-//const
 dotenv.config();
 
 //server
@@ -17,13 +14,9 @@ let sio = socket.listen(server);
 
 //libs
 import { Words } from "./models/Words"
-import { Guilds } from "./models/Guilds"
-import { TwitBot as FistonTwit, time } from "./lib/fiston-twit"
-import FistonDjs from "./lib/fiston-djs"
-//Words.setNext(103);
+import { TwitBot as FistonTwit, time } from "./lib/twitbot/Twitbot"
 //init
 const time: time = { h: 7, m: 30 };
-const discordbot = new FistonDjs(process.env.DJS_TOKEN);
 const twitbot = new FistonTwit({
     consumer: {
         key: process.env.TWIT_CONSUMER_KEY,
@@ -40,9 +33,6 @@ const twitbot = new FistonTwit({
 
 app.use(cors());
 app.use('/', twitbot.router);
-(async () => {
-    //await twitbot.Tweet()
-})()
 
 process.on("unhandledRejection", error => {
     console.error("Unhandled promise rejection:", error);
