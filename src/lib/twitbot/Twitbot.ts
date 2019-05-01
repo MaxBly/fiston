@@ -22,7 +22,7 @@ export class TwitBot {
         });
 
         this.router = express.Router();
-        this.router.use(express.static(__dirname + '/../../public'));
+        this.router.use(express.static(__dirname + '/public'));
 
         this.router.get('/save', async (req, res) => {
             let { word, credit } = req.params;
@@ -38,7 +38,7 @@ export class TwitBot {
         this.rule = new schedule.RecurrenceRule()
         this.rule.hour = time.h
         this.rule.minute = time.m
-        this.job = schedule.scheduleJob(this.rule, this.Tweet)
+        this.job = schedule.scheduleJob(this.rule, this.Tweet.bind(this))
         let n = this.job.nextInvocation();
         console.log('next tweet', {
             year: n.getFullYear(),

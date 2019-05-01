@@ -1,0 +1,29 @@
+.header {
+    margin-top: 50px;
+    margin-bottom: 50px
+}
+legend {
+    text-align: center;
+    font-size: 18px;
+}
+p {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+input {
+    margin-bottom: 20px;
+}
+#words {
+    margin-top: 50px;
+    padding-right: 0px;
+}
+#textbox {
+    margin-top: 20px;
+}
+fieldset {
+    border-radius: 10px;
+    border: 1px solid;
+}
+.mg20 {
+    margin-left: 0px;
+}

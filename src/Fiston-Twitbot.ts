@@ -1,15 +1,19 @@
 //require
-import http from "http";
+import https from "https";
 import express from "express";
 import cors from "cors";
+import fs from "fs";
 import dotenv from "dotenv";
 import socket from "socket.io";
 dotenv.config();
 
 //server
-
+const httpsOptions: https.ServerOptions = {
+    cert: fs.readFileSync('/etc/letsencrypt/live/bly-net.com/fullchain.pem'),
+    key: fs.readFileSync('/etc/letsencrypt/live/bly-net.com/privkey.pem'),
+}
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(httpsOptions, app);
 let sio = socket.listen(server);
 
 //libs
@@ -40,27 +44,42 @@ process.on("unhandledRejection", error => {
 
 sio.on('connection', (socket: any) => {
 
-    socket.on('getWords', () => {
-        Words.getWords({}).then((words: any) => socket.emit('loadWords', words))
-            .catch(console.error);
+    socket.on('getWords', async () => {
+        try {
+            let words = await Words.getWords({})
+            socket.emit('loadWords', words)
+        } catch (e) {
+            console.error(e);
+        }
     });
 
-    socket.on('getReducedWords', () => {
-        Words.reducer().then(words => socket.emit('loadReducedWords', words))
-            .catch(console.error);
+    socket.on('getReducedWords', async () => {
+        try {
+            let words = await Words.reducer()
+            socket.emit('loadReducedWords', words)
+        } catch (e) {
+            console.error(e);
+        }
     });
 
-    socket.on('save', (W: any) => {
-        Words.addWord(W).then((neW: any) => {
+    socket.on('save', async (W: any) => {
+        try {
+            let neW = await Words.addWord(W)
             console.log(neW);
             socket.emit('saveOk')
-        })
-            .catch(console.error);
+        } catch (e) {
+            console.error(e);
+
+        }
     });
 
-    socket.on('remove', (i: any) => {
-        Words.removeWord({ index: i }).then(() => socket.emit('removeOk'))
-            .catch(console.error);
+    socket.on('remove', async (i: number) => {
+        try {        
+            await Words.removeWord({ index: i })
+            socket.emit('removeOk')
+        } catch (e) {
+            console.error(e);
+        }
     });
 });
 
