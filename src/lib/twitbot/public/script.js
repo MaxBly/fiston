@@ -1,4 +1,4 @@
-const socket = io.connect('http://bly-net.com:7000/');
+const socket = io.connect('https://bly-net.com:7000/');
 // const socket = io.connect('http://localhost:7000');
 
 const table = document.createElement('table');
@@ -44,7 +44,7 @@ const loadTable = (words, table) => {
     table.className = "table table-hover";
     d_words.append(table);
     let st_tr = document.createElement('tr');
-    st_tr.className = "table-primary"
+    st_tr.className = "table-danger"
     table.append(st_tr);
     let st_th = document.createElement('th');
     let nd_th = document.createElement('th');
@@ -60,7 +60,7 @@ const loadTable = (words, table) => {
         let tr = document.createElement('tr');
         let i_th = document.createElement('th');
         if (words[i].isNext) {
-            tr.className = "table-success"
+            tr.className = "table-danger"
             i_th.innerText = "➤ " + (i + 1);
         } else {
             i_th.innerText = "# " + (i + 1);
